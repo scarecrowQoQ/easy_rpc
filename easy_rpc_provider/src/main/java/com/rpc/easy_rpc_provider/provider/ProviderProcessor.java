@@ -22,6 +22,5 @@ public class ProviderProcessor implements InitializingBean{
     @Override
     public void afterPropertiesSet() throws Exception {
         nettyServerStarter.start();
-        System.out.println("afterPropertiesSet");
     }
 }

@@ -14,7 +14,7 @@ public class RpcProperties {
      * 默认序列化方式
      */
     @NonNull
-    public String serialization = "HessianSerialization";
+    public String serialization = "jsonSerialization";
 
 
     /**

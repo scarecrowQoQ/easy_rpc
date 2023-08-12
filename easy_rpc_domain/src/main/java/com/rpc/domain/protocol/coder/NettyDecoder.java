@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public class NettyDecoder extends ByteToMessageDecoder {
     @Resource
     SerializationFactory serializationFactory;
@@ -23,16 +23,17 @@ public class NettyDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         int dataLength = byteBuf.readInt();
-        if(byteBuf.readableBytes() < dataLength){
-            byteBuf.resetReaderIndex();
-            return;
-        }
+//        if(byteBuf.readableBytes() < dataLength){
+//            byteBuf.resetReaderIndex();
+//            return;
+//        }
         RpcSerialization rpcSerialization = serializationFactory.getRpcSerialization();
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
         try {
             RpcRequestHolder requestHolder = rpcSerialization.deserialize(data, RpcRequestHolder.class);
             list.add(requestHolder);
+            System.out.println("解码成功");
         }catch (Exception e){
             System.out.println("序列化失败");
         }

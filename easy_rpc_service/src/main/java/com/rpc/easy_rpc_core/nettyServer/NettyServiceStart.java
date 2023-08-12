@@ -1,6 +1,7 @@
 package com.rpc.easy_rpc_core.nettyServer;
 
 import com.rpc.domain.config.RpcProperties;
+import com.rpc.easy_rpc_core.nettyServer.handler.NettyConnectHandler;
 import com.rpc.easy_rpc_core.nettyServer.handler.NettyHandlerInit;
 import com.rpc.domain.protocol.coder.NettyDecoder;
 import com.rpc.domain.protocol.coder.NettyEncoder;
@@ -44,6 +45,9 @@ public class NettyServiceStart implements Runnable, InitializingBean {
     @Resource
     NettyHandlerInit nettyHandlerInit;
 
+    @Resource
+    NettyConnectHandler nettyConnectHandler;
+
     @SneakyThrows
     @Override
     public void run() {
@@ -51,7 +55,6 @@ public class NettyServiceStart implements Runnable, InitializingBean {
         EventLoopGroup workGroup = new NioEventLoopGroup(12);
         try {
             Bootstrap bootstrap = new Bootstrap();
-
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup,workGroup)
                     .channel(NioServerSocketChannel.class)
@@ -64,7 +67,7 @@ public class NettyServiceStart implements Runnable, InitializingBean {
                                     .addLast("encode", nettyEncoder)
                                     .addLast(nettyHandlerInit);
                         }
-                    });
+                    }).handler(nettyConnectHandler);
             ChannelFuture channelFuture = serverBootstrap.bind().sync();
             System.out.println("开启netty服务:"+ channelFuture.channel().localAddress());
             channelFuture.channel().closeFuture().sync();

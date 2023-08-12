@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder> {
 
     @Resource
@@ -40,8 +40,8 @@ public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder> {
         try {
            byte[] data = rpcSerialization.serialize(requestHolder);
            byteBuf.writeInt(data.length);
-           System.out.println("data.length="+data.length);
            byteBuf.writeBytes(data);
+            System.out.println("饭序列化成功"+data.length);
        }catch (Exception e){
            e.printStackTrace();
            System.out.println("序列化失败");

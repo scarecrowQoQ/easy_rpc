@@ -8,7 +8,7 @@ public interface ConsumerService {
      * 消费者发送消费请求给服务提供者
      * @return
      */
-    public void sendRequest(ConsumeRequest consumeRequest);
+    public Object sendRequest(ConsumeRequest consumeRequest);
 
     /**
      * 消费者获取服务列表

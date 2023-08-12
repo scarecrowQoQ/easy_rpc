@@ -9,12 +9,8 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 
 @Controller
-public class TestController implements InitializingBean{
+public class TestController {
     @Resource
     RpcProperties rpcProperties;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("序列化="+rpcProperties.serialization);
-    }
 }

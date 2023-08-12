@@ -40,7 +40,6 @@ public class ConsumerProxy implements InvocationHandler{
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
         System.out.println("你在执行以下消费请求");
         System.out.println(consumeRequest);
-//        service.sendRequest(consumeRequest);
-        return null;
+        return service.sendRequest(consumeRequest);
     }
 }

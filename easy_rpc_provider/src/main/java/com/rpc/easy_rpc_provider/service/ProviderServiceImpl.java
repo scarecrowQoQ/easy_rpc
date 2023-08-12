@@ -33,9 +33,12 @@ public class ProviderServiceImpl implements ProviderService {
         if (channelFuture != null){
             CommonHeader commonHeader = new CommonHeader(RequestType.PUT_SERVICE);
             RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMeta);
-            channelFuture.channel().writeAndFlush(requestHolder);
+            try {
+                channelFuture.channel().writeAndFlush(requestHolder);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
-
         return true;
     }
 
@@ -55,7 +58,7 @@ public class ProviderServiceImpl implements ProviderService {
      */
 
     @Override
-    public  RpcRequestHolder  responseConsume(ConsumeRequest consumeRequest) {
+    public  RpcRequestHolder responseConsume(ConsumeRequest consumeRequest) {
         // 提取消费请求中的参数，包括标识id，服务方beanName，方法名，参数类型，参数值
         ProviderResponse providerResponse = new ProviderResponse();
         CommonHeader header = new CommonHeader(RequestType.RESPONSE_SERVICE);
@@ -66,7 +69,6 @@ public class ProviderServiceImpl implements ProviderService {
         Class<?>[] parameterTypes = consumeRequest.getParameterTypes();
         Object[] parameters = consumeRequest.getParameters();
         Object serviceBean = SpringContextUtil.getBeanByName(beanName);
-
         // 创建代理对象并执行目标方法，进行异常处理
         Class<?> serviceClass = serviceBean.getClass();
         FastClass fastClass = FastClass.create(serviceClass);

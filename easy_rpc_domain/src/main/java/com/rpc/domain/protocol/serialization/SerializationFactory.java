@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 
 @Data
 @Component
-public class SerializationFactory implements InitializingBean {
+public class SerializationFactory {
 
     @Resource
     RpcProperties rpcProperties;
@@ -21,8 +21,5 @@ public class SerializationFactory implements InitializingBean {
       return (RpcSerialization) SpringContextUtil.getBean(rpcProperties.serialization);
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("实例化序列工厂");
-    }
+
 }
