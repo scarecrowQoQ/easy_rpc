@@ -13,6 +13,10 @@ public class ProviderResponse {
      */
     private String requestId;
     /**
+     * 是否成功
+     */
+    private Boolean isSuccess;
+    /**
      * 状态码
      */
     private int code;

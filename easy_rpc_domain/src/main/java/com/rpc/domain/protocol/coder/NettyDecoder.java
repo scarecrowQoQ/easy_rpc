@@ -1,43 +1,43 @@
 package com.rpc.domain.protocol.coder;
 
-import com.rpc.domain.protocol.serialization.RpcSerialization;
-import com.rpc.domain.protocol.serialization.SerializationFactory;
-import com.rpc.domain.protocol.serialization.serializationImpl.HessianSerialization;
-import com.rpc.domain.protocol.serialization.serializationImpl.JsonSerialization;
+import com.rpc.domain.serialization.RpcSerialization;
+import com.rpc.domain.serialization.SerializationFactory;
 import com.rpc.domain.rpc.RpcRequestHolder;
+import com.rpc.domain.utils.SpringContextUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
+
+@Slf4j
 @Component
-//@Scope("prototype")
+@Scope("prototype")
 public class NettyDecoder extends ByteToMessageDecoder {
-    @Resource
-    SerializationFactory serializationFactory;
+
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         int dataLength = byteBuf.readInt();
-//        if(byteBuf.readableBytes() < dataLength){
-//            byteBuf.resetReaderIndex();
-//            return;
-//        }
-        RpcSerialization rpcSerialization = serializationFactory.getRpcSerialization();
+        if(byteBuf.readableBytes() < dataLength){
+            byteBuf.resetReaderIndex();
+            return;
+        }
+        System.out.println("serializationFactory=");
+        SerializationFactory serializationFactory = SpringContextUtil.getBean(SerializationFactory.class);
+        System.out.println(serializationFactory.toString());
+        RpcSerialization rpcSerialization =  serializationFactory.getRpcSerialization();
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
         try {
             RpcRequestHolder requestHolder = rpcSerialization.deserialize(data, RpcRequestHolder.class);
             list.add(requestHolder);
-            System.out.println("解码成功");
         }catch (Exception e){
-            System.out.println("序列化失败");
+            log.error("序列化失败");
         }
-
 
     }
 }

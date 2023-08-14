@@ -19,33 +19,35 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 
 @Configuration
 @Data
+@Component
 public class NettyConfig {
 
-    @Resource
-    NettyDecoder nettyDecoder;
-    @Resource
-    NettyEncoder nettyEncoder;
 
     @Resource
     RpcProperties.provider provider;
+
+    @Resource
+    ProviderHandler providerHandler;
 
     @Bean
     public Bootstrap Bootstrap(){
         Bootstrap bs = new Bootstrap();
         bs.group(new NioEventLoopGroup()).channel(NioSocketChannel.class)
+                .localAddress(8081)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
-                                .addLast("decode",nettyDecoder)
-                                .addLast("encode",nettyEncoder)
-                                .addLast(new ProviderHandler());
+                                .addLast("decode",new NettyDecoder())
+                                .addLast("encode",new NettyEncoder())
+                                .addLast(providerHandler);
                     }
                 });
         return bs;
@@ -59,9 +61,9 @@ public class NettyConfig {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline()
-                                    .addLast("decode",new StringDecoder())
-                                    .addLast("encode",new StringEncoder())
-                                    .addLast(new ProviderHandler());
+                                    .addLast("decode",new NettyDecoder())
+                                    .addLast("encode",new NettyEncoder())
+                                    .addLast(providerHandler);
                         }
                     });
 

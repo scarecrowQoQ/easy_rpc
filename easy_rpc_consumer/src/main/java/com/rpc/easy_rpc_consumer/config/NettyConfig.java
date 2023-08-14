@@ -9,6 +9,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,11 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @Configuration
+
+@RequiredArgsConstructor
 public class NettyConfig {
-    @Resource
-    NettyDecoder nettyDecoder;
-    @Resource
-    NettyEncoder nettyEncoder;
     @Resource
     ConsumerHandler consumerHandler;
     @Bean
@@ -32,8 +31,8 @@ public class NettyConfig {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
-                                .addLast("decode", nettyDecoder)
-                                .addLast("encode", nettyEncoder)
+                                .addLast("decode",new NettyDecoder())
+                                .addLast("encode",new NettyEncoder())
                                 .addLast(consumerHandler);
                     }
                 });

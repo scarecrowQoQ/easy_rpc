@@ -1,9 +1,9 @@
-package com.rpc.domain.protocol.serialization.serializationImpl;
+package com.rpc.domain.serialization.serializationImpl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rpc.domain.protocol.serialization.RpcSerialization;
+import com.rpc.domain.serialization.RpcSerialization;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

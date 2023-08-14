@@ -1,8 +1,8 @@
-package com.rpc.domain.protocol.serialization.serializationImpl;
+package com.rpc.domain.serialization.serializationImpl;
 
 import com.caucho.hessian.io.HessianSerializerInput;
 import com.caucho.hessian.io.HessianSerializerOutput;
-import com.rpc.domain.protocol.serialization.RpcSerialization;
+import com.rpc.domain.serialization.RpcSerialization;
 import com.sun.xml.internal.ws.encoding.soap.SerializationException;
 import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;

@@ -28,6 +28,7 @@ public class ConsumerServiceImpl implements ConsumerService{
     @Resource
     ResponseCache responseCache;
 
+
     /**
      * 执行逻辑
      * 1: 根据本地服务缓存列表查询远程服务地址（负载均衡策略）
@@ -94,10 +95,11 @@ public class ConsumerServiceImpl implements ConsumerService{
             channelFuture = bootstrap.connect(host, port).sync();
 
         }catch (Exception e){
-            System.out.println("连接失败，请检查服务端是否开启");
+            log.error("连接失败，请检查服务端是否开启");
             e.printStackTrace();
         }
         if (channelFuture!=null && channelFuture.isSuccess()) {
+            log.info("连接成功");
             return channelFuture;
         }else {
             return null;

@@ -1,4 +1,4 @@
-package com.rpc.domain.protocol.serialization;
+package com.rpc.domain.serialization;
 
 import java.io.IOException;
 

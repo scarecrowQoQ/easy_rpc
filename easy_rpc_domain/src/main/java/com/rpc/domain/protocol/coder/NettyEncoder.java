@@ -1,28 +1,21 @@
 package com.rpc.domain.protocol.coder;
 
-import com.rpc.domain.protocol.serialization.RpcSerialization;
-import com.rpc.domain.protocol.serialization.SerializationFactory;
-import com.rpc.domain.protocol.serialization.serializationImpl.HessianSerialization;
-import com.rpc.domain.protocol.serialization.serializationImpl.JsonSerialization;
+import com.rpc.domain.serialization.RpcSerialization;
+import com.rpc.domain.serialization.SerializationFactory;
+
 import com.rpc.domain.rpc.RpcRequestHolder;
 import com.rpc.domain.utils.SpringContextUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.List;
+@Slf4j
 @Component
-//@Scope("prototype")
-public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder> {
-
-    @Resource
-    SerializationFactory serializationFactory;
+@Scope("prototype")
+public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder>{
 
     /**
      * 编码器 步骤：
@@ -34,18 +27,23 @@ public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder> {
      * @param byteBuf
      * @throws Exception
      */
+//    @Resource
+//    private SerializationFactory serializationFactory;
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcRequestHolder requestHolder, ByteBuf byteBuf) throws Exception {
-        RpcSerialization rpcSerialization = serializationFactory.getRpcSerialization();
         try {
-           byte[] data = rpcSerialization.serialize(requestHolder);
-           byteBuf.writeInt(data.length);
-           byteBuf.writeBytes(data);
-            System.out.println("饭序列化成功"+data.length);
-       }catch (Exception e){
-           e.printStackTrace();
-           System.out.println("序列化失败");
-       }
-
+            System.out.println("serializationFactory=");
+            SerializationFactory serializationFactory = SpringContextUtil.getBean(SerializationFactory.class);
+            System.out.println(serializationFactory.toString());
+            RpcSerialization rpcSerialization =  serializationFactory.getRpcSerialization();
+            System.out.println("rpcSerialization=");
+            System.out.println(rpcSerialization);
+            byte[] data = rpcSerialization.serialize(requestHolder);
+            byteBuf.writeInt(data.length);
+            byteBuf.writeBytes(data);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("序列化失败");
+        }
     }
 }

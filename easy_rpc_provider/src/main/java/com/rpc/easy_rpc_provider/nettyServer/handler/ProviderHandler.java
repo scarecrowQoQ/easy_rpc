@@ -8,6 +8,7 @@ import com.rpc.domain.rpc.RpcRequestHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
 public class ProviderHandler extends SimpleChannelInboundHandler<RpcRequestHolder> {
 
     @Resource
+    @Lazy
     ProviderService registerService;
 
     @Override

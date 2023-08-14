@@ -2,7 +2,7 @@ package com.rpc.domain.protocol.enum2;
 
 public enum RequestType {
 //    注册服务
-    PUT_SERVICE,
+    SEND_SERVICE,
 //    拉取服务
     GET_SERVICE,
 //    消费服务

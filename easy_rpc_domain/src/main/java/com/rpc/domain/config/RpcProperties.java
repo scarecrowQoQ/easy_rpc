@@ -8,13 +8,14 @@ import org.springframework.validation.annotation.Validated;
 @Configuration
 @ConfigurationProperties(prefix = "rpc")
 @Validated
+@Data
 public class RpcProperties {
 
     /**
      * 默认序列化方式
      */
     @NonNull
-    public String serialization = "jsonSerialization";
+    public String serialization = "hessianSerialization";
 
 
     /**

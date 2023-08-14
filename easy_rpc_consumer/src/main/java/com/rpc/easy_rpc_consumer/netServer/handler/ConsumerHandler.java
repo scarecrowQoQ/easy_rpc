@@ -21,14 +21,10 @@ import javax.annotation.Resource;
 public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     @Resource
-    private ConsumerService consumerService;
-
-    @Resource
     ServiceListHolder serviceListHolder;
 
     @Resource
     ResponseCache responseCache;
-
 
     /**
      * 这里进行服务提供者返回数据接收
@@ -39,22 +35,16 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
-        if(commonHeader.getType() == RequestType.RESPONSE_SERVICE){
+        RequestType type = commonHeader.getType();
+        if(type.equals(RequestType.RESPONSE_SERVICE)){
             ProviderResponse providerResponse = (ProviderResponse) requestHolder.getData();
             responseCache.addResult(providerResponse.getRequestId(),providerResponse);
         }
-
-    }
-
-    /**
-     * 这里进行服务列表获取
-     * @param ctx
-     * @throws Exception
-     */
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("注册中心连接成功，开始服务列表拉取");
-        ServiceListHolder newServiceList = consumerService.getServiceList();
-        serviceListHolder.setServiceList(newServiceList.getServiceList());
+//        服务列表获取
+        else if(type.equals(RequestType.SEND_SERVICE)){
+            ServiceListHolder newServiceListHolder = (ServiceListHolder) requestHolder.getData();
+            log.info("成功获取到服务列表"+newServiceListHolder.toString());
+            serviceListHolder.updateService(newServiceListHolder.getServiceList());
+        }
     }
 }

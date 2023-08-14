@@ -6,16 +6,18 @@ import com.rpc.domain.utils.SpringContextUtil;
 import com.rpc.domain.protocol.enum2.RequestType;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.reflect.FastClass;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ProviderServiceImpl implements ProviderService {
-
 
     @Autowired
     Bootstrap bootstrap;
@@ -23,23 +25,29 @@ public class ProviderServiceImpl implements ProviderService {
     @Resource
     RpcProperties.RPCServer server;
 
+    private List<ServiceMeta> serviceMetas = new ArrayList<>();
+
     @Override
-    public Boolean registerService(ServiceMeta serviceMeta) {
-        System.out.println(serviceMeta);
+    public Boolean registerService() {
 //        首先尝试连接注册中心
         String host = server.getHost();
         int port = server.getPort();
         ChannelFuture channelFuture = connectTargetService(host, port);
         if (channelFuture != null){
-            CommonHeader commonHeader = new CommonHeader(RequestType.PUT_SERVICE);
-            RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMeta);
             try {
+                CommonHeader commonHeader = new CommonHeader(RequestType.SEND_SERVICE);
+                RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMetas);
+                log.info("开始发送消息");
                 channelFuture.channel().writeAndFlush(requestHolder);
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
         return true;
+    }
+    @Override
+    public void addServiceMeta(ServiceMeta serviceMeta){
+        this.serviceMetas.add(serviceMeta);
     }
 
     @Override
@@ -76,11 +84,14 @@ public class ProviderServiceImpl implements ProviderService {
         try {
             Object targetMethodRes = fastClass.invoke(methodIndex, serviceBean, parameters);
             providerResponse.setCode(200);
+            providerResponse.setIsSuccess(true);
             providerResponse.setResult(targetMethodRes);
         }catch (InvocationTargetException e ){
             e.printStackTrace();
+            log.error("目标方法执行出错，检查方法:"+methodName+"执行beanName:"+beanName);
             providerResponse.setError("服务方运行出错！---执行beanName:"+beanName+"执行方法名:"+methodName);
             providerResponse.setCode(500);
+            providerResponse.setIsSuccess(false);
         }
         return new RpcRequestHolder(header,providerResponse);
     }
@@ -96,11 +107,11 @@ public class ProviderServiceImpl implements ProviderService {
         try {
             channelFuture = bootstrap.connect(host, port).sync();
         } catch (Exception e) {
-            System.out.println("连接失败，请检查服务端是否开启");
+            log.error("连接失败，请检查服务端是否开启");
             e.printStackTrace();
         }
         if (channelFuture != null && channelFuture.isSuccess()) {
-            System.out.println("注册中心连接成功");
+            log.info("注册中心连接成功");
             return channelFuture;
         } else {
             return null;

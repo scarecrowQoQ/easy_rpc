@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -11,7 +12,8 @@ import java.util.UUID;
  */
 @Data
 @AllArgsConstructor
-public class ConsumeRequest {
+
+public class ConsumeRequest implements Serializable {
 
     /**
      * 本次请求标识ID
