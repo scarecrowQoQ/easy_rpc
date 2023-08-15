@@ -40,7 +40,6 @@ public class NettyConfig {
     public Bootstrap Bootstrap(){
         Bootstrap bs = new Bootstrap();
         bs.group(new NioEventLoopGroup()).channel(NioSocketChannel.class)
-                .localAddress(8081)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {

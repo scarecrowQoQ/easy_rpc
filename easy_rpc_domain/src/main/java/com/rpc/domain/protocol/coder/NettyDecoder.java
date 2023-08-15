@@ -26,9 +26,7 @@ public class NettyDecoder extends ByteToMessageDecoder {
             byteBuf.resetReaderIndex();
             return;
         }
-        System.out.println("serializationFactory=");
         SerializationFactory serializationFactory = SpringContextUtil.getBean(SerializationFactory.class);
-        System.out.println(serializationFactory.toString());
         RpcSerialization rpcSerialization =  serializationFactory.getRpcSerialization();
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);

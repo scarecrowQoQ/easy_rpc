@@ -4,9 +4,11 @@ import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
 import com.rpc.easy_rpc_consumer.service.ConsumerService;
 import com.rpc.domain.rpc.ConsumeRequest;
 import com.rpc.domain.utils.SpringContextUtil;
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-
+@Slf4j
 public class ConsumerProxy implements InvocationHandler{
 
     private  final String serviceName;
@@ -38,8 +40,7 @@ public class ConsumerProxy implements InvocationHandler{
         consumeRequest.setParameters(args);
         consumeRequest.setParameterTypes(method.getParameterTypes());
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
-        System.out.println("你在执行以下消费请求");
-        System.out.println(consumeRequest);
+        log.info("执行消费请求"+consumeRequest.toString());
         return service.sendRequest(consumeRequest);
     }
 }

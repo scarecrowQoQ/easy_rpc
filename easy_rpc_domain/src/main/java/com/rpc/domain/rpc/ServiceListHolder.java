@@ -23,7 +23,7 @@ public class ServiceListHolder implements Serializable {
             String serviceName = meta.getServiceName();
             List<ServiceMeta> serviceMetas = serviceList.getOrDefault(serviceName, new ArrayList<>());
             serviceMetas.add(meta);
-            log.info("服务添加成功！ 服务名"+serviceName+"服务内容"+serviceMetas);
+            serviceList.put(serviceName,serviceMetas);
         }
 
     }

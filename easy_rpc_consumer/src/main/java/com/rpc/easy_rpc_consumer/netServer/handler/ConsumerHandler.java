@@ -10,6 +10,9 @@ import com.rpc.domain.rpc.RpcRequestHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.DefaultEventLoop;
+import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +38,14 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
+
         RequestType type = commonHeader.getType();
         if(type.equals(RequestType.RESPONSE_SERVICE)){
+            log.info("类型为响应消费");
             ProviderResponse providerResponse = (ProviderResponse) requestHolder.getData();
-            responseCache.addResult(providerResponse.getRequestId(),providerResponse);
+            String requestId = providerResponse.getRequestId();
+            Promise<ProviderResponse> promise = responseCache.getPromise(requestId);
+            promise.setSuccess(providerResponse);
         }
 //        服务列表获取
         else if(type.equals(RequestType.SEND_SERVICE)){
@@ -46,5 +53,11 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             log.info("成功获取到服务列表"+newServiceListHolder.toString());
             serviceListHolder.updateService(newServiceListHolder.getServiceList());
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 }

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Service;
 
 
 public interface TestApi {
-    public void test();
+    public String test();
 }

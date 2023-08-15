@@ -56,10 +56,8 @@ public class NettyServerStarter {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
-//                                .addLast("decode",new NettyDecoder())
-//                                .addLast("encode",new NettyEncoder())
-                                .addLast("decode",nettyDecoder)
-                                .addLast("encode",nettyEncoder)
+                                .addLast("decode",new NettyDecoder())
+                                .addLast("encode",new NettyEncoder())
                                 .addLast(providerHandler);
                     }
                 });

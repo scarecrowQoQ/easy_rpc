@@ -86,6 +86,7 @@ public class ProviderServiceImpl implements ProviderService {
             providerResponse.setCode(200);
             providerResponse.setIsSuccess(true);
             providerResponse.setResult(targetMethodRes);
+            log.info("执行成功!");
         }catch (InvocationTargetException e ){
             e.printStackTrace();
             log.error("目标方法执行出错，检查方法:"+methodName+"执行beanName:"+beanName);
@@ -107,7 +108,7 @@ public class ProviderServiceImpl implements ProviderService {
         try {
             channelFuture = bootstrap.connect(host, port).sync();
         } catch (Exception e) {
-            log.error("连接失败，请检查服务端是否开启");
+            log.error("连接失败，请检查服务端是否开启,host="+host+",port="+port);
             e.printStackTrace();
         }
         if (channelFuture != null && channelFuture.isSuccess()) {

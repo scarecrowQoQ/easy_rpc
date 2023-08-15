@@ -18,9 +18,9 @@ public class TestServiceImpl implements InitializingBean{
 
    @RequestMapping("/test")
     public void afterPropertiesSet2() throws Exception {
-       RpcProperties.RPCServer server = SpringContextUtil.getBean(RpcProperties.RPCServer.class);
-       System.out.println(server.getHost());
-    }
+       String test = testService.test();
+       System.out.println("test="+test);
+   }
 
     @Override
     public void afterPropertiesSet() throws Exception {

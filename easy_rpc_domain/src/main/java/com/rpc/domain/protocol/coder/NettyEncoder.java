@@ -32,12 +32,8 @@ public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder>{
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcRequestHolder requestHolder, ByteBuf byteBuf) throws Exception {
         try {
-            System.out.println("serializationFactory=");
             SerializationFactory serializationFactory = SpringContextUtil.getBean(SerializationFactory.class);
-            System.out.println(serializationFactory.toString());
             RpcSerialization rpcSerialization =  serializationFactory.getRpcSerialization();
-            System.out.println("rpcSerialization=");
-            System.out.println(rpcSerialization);
             byte[] data = rpcSerialization.serialize(requestHolder);
             byteBuf.writeInt(data.length);
             byteBuf.writeBytes(data);

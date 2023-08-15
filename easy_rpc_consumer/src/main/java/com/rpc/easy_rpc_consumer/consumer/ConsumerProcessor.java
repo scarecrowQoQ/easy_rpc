@@ -22,16 +22,9 @@ public class ConsumerProcessor implements InitializingBean{
     @Resource
     ConsumerService consumerService;
 
-
-
     @Override
     public void afterPropertiesSet() throws Exception {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                consumerService.getServiceList();
-            }
-        });
+        consumerService.getServiceList();
     }
 
 

@@ -41,6 +41,7 @@ public class NettyHandlerInit extends SimpleChannelInboundHandler<RpcRequestHold
             log.info("返回服务列表");
             CommonHeader header = new CommonHeader(RequestType.SEND_SERVICE);
             RpcRequestHolder res = new RpcRequestHolder(header,serviceListHolder);
+            log.info(String.valueOf(serviceListHolder));
             ctx.channel().writeAndFlush(res);
         }
     }

@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestApiImpl implements TestApi{
     @Override
-    public void test() {
+    public String test() {
         System.out.println("目标方法执行");
+        return "调用成功";
     }
 }

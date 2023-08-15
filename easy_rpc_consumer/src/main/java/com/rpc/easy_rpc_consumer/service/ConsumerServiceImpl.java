@@ -7,6 +7,10 @@ import com.rpc.easy_rpc_consumer.cach.ResponseCache;
 import com.rpc.domain.rpc.ServiceListHolder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +43,7 @@ public class ConsumerServiceImpl implements ConsumerService{
      */
     @Override
     public Object sendRequest(ConsumeRequest consumeRequest) {
+        String requestId = consumeRequest.getRequestId();
         ServiceMeta service = serviceListHolder.getService(consumeRequest.getServiceName());
         String providerHost = service.getServiceHost();
         int providerPort = service.getServicePort();
@@ -48,17 +53,15 @@ public class ConsumerServiceImpl implements ConsumerService{
         ChannelFuture channelFuture = connectTargetService(providerHost, providerPort);
         if(channelFuture != null){
             Channel channel = channelFuture.channel();
+            Promise<ProviderResponse> promise = new DefaultPromise<>(new DefaultEventLoop());
+            responseCache.putPromise(requestId,promise);
             RpcRequestHolder requestHolder = new RpcRequestHolder(header,consumeRequest);
             try {
                 channel.writeAndFlush(requestHolder);
-                if (channelFuture.isDone()) {
-//                    这里无法拿到响应结果，需要从handler代码中将结果放入缓存中，再根据id来拿去结果
-                    ProviderResponse result = responseCache.getResult(consumeRequest.getRequestId());
-                    log.info(result.toString());
-                    return result.getResult();
-                }else {
-                    log.error("获取响应数据失败");
-                }
+//              这里无法拿到响应结果，需要从handler代码中将结果放入缓存中，再根据id来拿去结果
+                ProviderResponse result = responseCache.getResult(promise);
+                log.info("执行结果响应："+result.toString());
+                return result.getResult();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -79,7 +82,6 @@ public class ConsumerServiceImpl implements ConsumerService{
             Channel channel = channelFuture.channel();
             channel.writeAndFlush(requestHolder);
         }
-
         return null;
     }
 
@@ -95,11 +97,11 @@ public class ConsumerServiceImpl implements ConsumerService{
             channelFuture = bootstrap.connect(host, port).sync();
 
         }catch (Exception e){
-            log.error("连接失败，请检查服务端是否开启");
+            log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);
             e.printStackTrace();
         }
         if (channelFuture!=null && channelFuture.isSuccess()) {
-            log.info("连接成功");
+            log.info("连接成功,目标Host:"+host+"port:"+port);
             return channelFuture;
         }else {
             return null;

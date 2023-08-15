@@ -32,7 +32,6 @@ public class ProviderProcessor implements InitializingBean, EnvironmentAware {
     @Override
     public void afterPropertiesSet() throws Exception {
         nettyServerStarter.start();
-        System.out.println("开启线程");
     }
 
     @Override
