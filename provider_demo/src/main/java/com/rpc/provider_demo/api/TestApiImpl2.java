@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 
 @EasyRpcProvider(serviceName = "test")
 @Service
-public class TestApiImpl implements TestApi{
+public class TestApiImpl2 implements TestApi{
     @Override
     public String test() {
-        System.out.println("目标方法执行1");
-        return "调用成功1";
+        System.out.println("目标方法执行2");
+        return "调用成功2";
     }
 }

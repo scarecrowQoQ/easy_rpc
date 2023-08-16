@@ -6,14 +6,9 @@ import com.rpc.easy_rpc_provider.annotation.EasyRpcProvider;
 import com.rpc.easy_rpc_provider.service.ProviderService;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +23,7 @@ public class ProviderFinder implements BeanPostProcessor{
 
     @Resource
     RpcProperties.provider provider;
+
     @Resource
     ProviderService providerService;
 
@@ -37,21 +33,12 @@ public class ProviderFinder implements BeanPostProcessor{
     public Object postProcessBeforeInitialization(Object bean,@NonNull String beanName) throws BeansException {
         EasyRpcProvider easyRpcProvider = bean.getClass().getAnnotation(EasyRpcProvider.class);
         if (easyRpcProvider != null) {
-            ServiceMeta serviceMeta = null;
             String serviceName = easyRpcProvider.serviceName();
             String serviceHost = provider.getHost();
             int servicePort = provider.getPort();
-            serviceMeta = new ServiceMeta(serviceName, beanName, serviceHost, servicePort,System.currentTimeMillis());
+            ServiceMeta serviceMeta = new ServiceMeta(serviceName, beanName, serviceHost, servicePort,System.currentTimeMillis(),0);
             providerService.addServiceMeta(serviceMeta);
-
         }
         return bean;
     }
-
-//    @PostConstruct
-//    public void test() throws BeansException {
-//
-//
-//    }
-
 }

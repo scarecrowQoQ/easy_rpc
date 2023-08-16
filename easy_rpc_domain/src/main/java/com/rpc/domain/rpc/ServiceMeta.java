@@ -33,4 +33,8 @@ public class ServiceMeta implements Serializable {
      * 上传日期
      */
     private Long updateTime;
+    /**
+     * 活跃数即连接数（每次上传后重置为0）
+     */
+    private int actives;
 }

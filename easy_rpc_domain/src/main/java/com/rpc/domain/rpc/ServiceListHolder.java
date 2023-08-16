@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceListHolder implements Serializable {
 
     private  ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
+
+
 
     public void addService( List<ServiceMeta> metas){
         for (ServiceMeta meta : metas) {
@@ -38,14 +41,9 @@ public class ServiceListHolder implements Serializable {
      * @param serviceName
      * @return
      */
-    public ServiceMeta getService(String serviceName){
-        if(serviceList.containsKey(serviceName)){
-            List<ServiceMeta> serviceMetas = serviceList.get(serviceName);
-//            进行负载均衡策略（暂时返回第一个）
-            return serviceMetas.get(0);
-        }else {
-            return null;
-        }
+    public List<ServiceMeta>  getService(String serviceName){
+        //            进行负载均衡策略（暂时返回第一个）
+        return serviceList.getOrDefault(serviceName, null);
 
     }
 

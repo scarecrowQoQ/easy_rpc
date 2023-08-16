@@ -41,7 +41,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
         RequestType type = commonHeader.getType();
         if(type.equals(RequestType.RESPONSE_SERVICE)){
-            log.info("类型为响应消费");
             ProviderResponse providerResponse = (ProviderResponse) requestHolder.getData();
             String requestId = providerResponse.getRequestId();
             Promise<ProviderResponse> promise = responseCache.getPromise(requestId);

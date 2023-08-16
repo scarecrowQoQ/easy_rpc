@@ -16,7 +16,7 @@ public class TestServiceImpl implements InitializingBean{
     private TestService testService;
 
 
-   @RequestMapping("/test")
+    @RequestMapping("/test")
     public void afterPropertiesSet2() throws Exception {
        String test = testService.test();
        System.out.println("test="+test);

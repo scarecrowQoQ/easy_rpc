@@ -27,7 +27,6 @@ public class ProviderHandler extends SimpleChannelInboundHandler<RpcRequestHolde
         CommonHeader commonHeader = requestHolder.getCommonHeader();
 
         if (commonHeader.getType().equals(RequestType.CONSUME_SERVICE)) {
-            log.info(("响应消费者中"));
             ConsumeRequest consumeRequest = (ConsumeRequest) requestHolder.getData();
             RpcRequestHolder response = registerService.responseConsume(consumeRequest);
             channelHandlerContext.writeAndFlush(response);

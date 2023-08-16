@@ -5,16 +5,16 @@ import com.rpc.domain.protocol.enum2.RequestType;
 import com.rpc.domain.rpc.*;
 import com.rpc.easy_rpc_consumer.cach.ResponseCache;
 import com.rpc.domain.rpc.ServiceListHolder;
+import com.rpc.easy_rpc_consumer.loadBalancer.LoadBalancer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.concurrent.DefaultPromise;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -32,6 +32,9 @@ public class ConsumerServiceImpl implements ConsumerService{
     @Resource
     ResponseCache responseCache;
 
+    @Resource
+    LoadBalancer loadBalancer;
+
 
     /**
      * 执行逻辑
@@ -44,7 +47,10 @@ public class ConsumerServiceImpl implements ConsumerService{
     @Override
     public Object sendRequest(ConsumeRequest consumeRequest) {
         String requestId = consumeRequest.getRequestId();
-        ServiceMeta service = serviceListHolder.getService(consumeRequest.getServiceName());
+        List<ServiceMeta> services = serviceListHolder.getService(consumeRequest.getServiceName());
+        log.info("当前可选服务"+services);
+        ServiceMeta service = loadBalancer.selectService(services);
+        log.info("当前选择服务"+service.toString());
         String providerHost = service.getServiceHost();
         int providerPort = service.getServicePort();
         String beanName = service.getBeanName();
@@ -60,6 +66,7 @@ public class ConsumerServiceImpl implements ConsumerService{
                 channel.writeAndFlush(requestHolder);
 //              这里无法拿到响应结果，需要从handler代码中将结果放入缓存中，再根据id来拿去结果
                 ProviderResponse result = responseCache.getResult(promise);
+                responseCache.removeResponse(requestId);
                 log.info("执行结果响应："+result.toString());
                 return result.getResult();
             }catch (Exception e){

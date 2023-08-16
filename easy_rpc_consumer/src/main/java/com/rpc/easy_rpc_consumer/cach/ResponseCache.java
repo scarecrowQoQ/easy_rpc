@@ -28,6 +28,11 @@ public class ResponseCache {
         return responseCache.get(requestId);
     }
 
+    public void removeResponse(String requestId){
+        if(responseCache.contains(requestId)){
+            responseCache.remove(requestId);
+        }
+    }
 
     public ProviderResponse getResult(Promise<ProviderResponse> promise) throws ExecutionException, InterruptedException {
         return  promise.get();

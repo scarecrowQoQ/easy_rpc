@@ -40,6 +40,24 @@ public class RpcProperties {
 
     }
     /**
+     * 此为消费者配置
+     */
+    @Data
+    @Component
+    @ConfigurationProperties(prefix = "rpc.consumer")
+    public static class RPCConsumer{
+        /**
+         * 负载均衡策略,默认为轮询
+         */
+        public String loadBalance = "leastActives";
+
+        /**
+         * 服务拉取时间,默认12秒
+         */
+        public int getServiceTime = 12;
+    }
+
+    /**
      * 此为注册中心配置
      */
     @Data
@@ -60,7 +78,8 @@ public class RpcProperties {
          * 服务过期时间,默认12秒
          */
         public int serviceSaveTime = 12;
-
     }
+
+
 
 }
