@@ -15,6 +15,8 @@ public @interface RpcConsumer {
 
     long timeout() default 3000;
 
+    Class<?> fallback() default void.class;
+
     String loadBalancer() default "loadBalancer";
 
 }

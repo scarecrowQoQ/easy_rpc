@@ -5,15 +5,16 @@ import com.rpc.easy_rpc_consumer.service.ConsumerService;
 import com.rpc.domain.rpc.ConsumeRequest;
 import com.rpc.domain.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.reflect.FastClass;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 @Slf4j
 public class ConsumerProxy implements InvocationHandler{
 
-    private  final String serviceName;
+    private final String serviceName;
 
-
+    private Class<?> fallBack;
 
     public ConsumerProxy(RpcConsumer rpcConsumer){
         this.serviceName = rpcConsumer.serviceName();
@@ -41,6 +42,21 @@ public class ConsumerProxy implements InvocationHandler{
         consumeRequest.setParameterTypes(method.getParameterTypes());
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
         log.info("执行消费请求"+consumeRequest.toString());
-        return service.sendRequest(consumeRequest);
+
+        Object result = service.sendRequest(consumeRequest);
+//        如果成功响应（非熔断/拦截状态）
+        if(result != null){
+            return result;
+        }
+//        检查是否有降级类，执行降级方法
+        if(fallBack != void.class){
+            FastClass fastClass = FastClass.create(fallBack);
+            int methodIndex = fastClass.getIndex(method.getName(), method.getParameterTypes());
+            Object invoke = fastClass.invoke(methodIndex, proxy, args);
+            return invoke;
+        }else{
+            log.error("连接超时！！没有熔断类!");
+            return null;
+        }
     }
 }

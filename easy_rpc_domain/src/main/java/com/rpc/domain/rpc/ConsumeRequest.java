@@ -12,7 +12,6 @@ import java.util.UUID;
  */
 @Data
 @AllArgsConstructor
-
 public class ConsumeRequest implements Serializable {
 
     /**

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Data
@@ -34,8 +35,4 @@ public class ResponseCache {
         }
     }
 
-    public ProviderResponse getResult(Promise<ProviderResponse> promise) throws ExecutionException, InterruptedException {
-        return  promise.get();
-
-    }
 }

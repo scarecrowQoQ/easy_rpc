@@ -3,8 +3,10 @@ import com.rpc.domain.rpc.CommonHeader;
 import com.rpc.domain.config.RpcProperties;
 import com.rpc.domain.protocol.enum2.RequestType;
 import com.rpc.domain.rpc.*;
+import com.rpc.easy_rpc_consumer.cach.ConnectCache;
 import com.rpc.easy_rpc_consumer.cach.ResponseCache;
 import com.rpc.domain.rpc.ServiceListHolder;
+import com.rpc.easy_rpc_consumer.fuse.FuseProtector;
 import com.rpc.easy_rpc_consumer.loadBalancer.LoadBalancer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -15,11 +17,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
 public class ConsumerServiceImpl implements ConsumerService{
-
     @Resource
     Bootstrap bootstrap;
 
@@ -35,6 +38,12 @@ public class ConsumerServiceImpl implements ConsumerService{
     @Resource
     LoadBalancer loadBalancer;
 
+    @Resource
+    ConnectCache connectCache;
+
+    @Resource
+    FuseProtector fuseProtector;
+
 
     /**
      * 执行逻辑
@@ -46,6 +55,13 @@ public class ConsumerServiceImpl implements ConsumerService{
      */
     @Override
     public Object sendRequest(ConsumeRequest consumeRequest) {
+        /**
+         * 检查服务状态，是否进行熔断
+         */
+        boolean isAvailable = fuseProtector.checkService(consumeRequest.getServiceName());
+        if(!isAvailable){
+            return null;
+        }
         String requestId = consumeRequest.getRequestId();
         List<ServiceMeta> services = serviceListHolder.getService(consumeRequest.getServiceName());
         log.info("当前可选服务"+services);
@@ -64,13 +80,15 @@ public class ConsumerServiceImpl implements ConsumerService{
             RpcRequestHolder requestHolder = new RpcRequestHolder(header,consumeRequest);
             try {
                 channel.writeAndFlush(requestHolder);
-//              这里无法拿到响应结果，需要从handler代码中将结果放入缓存中，再根据id来拿去结果
-                ProviderResponse result = responseCache.getResult(promise);
+                ProviderResponse result = promise.get(1000l, TimeUnit.SECONDS);
                 responseCache.removeResponse(requestId);
                 log.info("执行结果响应："+result.toString());
                 return result.getResult();
             }catch (Exception e){
                 e.printStackTrace();
+                if(e instanceof TimeoutException){
+
+                }
             }
         }
         return null;
@@ -99,15 +117,19 @@ public class ConsumerServiceImpl implements ConsumerService{
      * @return
      */
     private ChannelFuture connectTargetService(String host,int port){
+        String address = host + ":" + port;
         ChannelFuture channelFuture = null;
-        try {
-            channelFuture = bootstrap.connect(host, port).sync();
-
-        }catch (Exception e){
-            log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);
-            e.printStackTrace();
+        channelFuture = connectCache.getChannelFuture(address);
+        if(channelFuture == null){
+            try {
+                channelFuture = bootstrap.connect(host, port).sync();
+            }catch (Exception e){
+                log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);
+                e.printStackTrace();
+            }
         }
         if (channelFuture!=null && channelFuture.isSuccess()) {
+            connectCache.putChannelFuture(address,channelFuture);
             log.info("连接成功,目标Host:"+host+"port:"+port);
             return channelFuture;
         }else {

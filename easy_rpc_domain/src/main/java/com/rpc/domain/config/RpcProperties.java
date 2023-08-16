@@ -50,7 +50,10 @@ public class RpcProperties {
          * 负载均衡策略,默认为轮询
          */
         public String loadBalance = "leastActives";
-
+        /**
+         * 熔断比率
+         */
+        public Float k = 1.5f;
         /**
          * 服务拉取时间,默认12秒
          */
