@@ -18,6 +18,7 @@ public class ConsumerProxy implements InvocationHandler{
 
     public ConsumerProxy(RpcConsumer rpcConsumer){
         this.serviceName = rpcConsumer.serviceName();
+        this.fallBack = rpcConsumer.fallback();
     }
 
     /**
@@ -42,21 +43,25 @@ public class ConsumerProxy implements InvocationHandler{
         consumeRequest.setParameterTypes(method.getParameterTypes());
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
         log.info("执行消费请求"+consumeRequest.toString());
-
         Object result = service.sendRequest(consumeRequest);
 //        如果成功响应（非熔断/拦截状态）
         if(result != null){
             return result;
         }
-//        检查是否有降级类，执行降级方法
+//      非正常响应，检查是否有降级类，执行降级方法
         if(fallBack != void.class){
-            FastClass fastClass = FastClass.create(fallBack);
-            int methodIndex = fastClass.getIndex(method.getName(), method.getParameterTypes());
-            Object invoke = fastClass.invoke(methodIndex, proxy, args);
-            return invoke;
+            try {
+                Object bean = SpringContextUtil.getBean(fallBack);
+                Method method1 = fallBack.getMethod(method.getName(), method.getParameterTypes());
+                Object res = method1.invoke(bean, args);
+                return res;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }else{
             log.error("连接超时！！没有熔断类!");
-            return null;
+
         }
+        return null;
     }
 }

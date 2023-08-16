@@ -5,5 +5,7 @@ import org.springframework.stereotype.Service;
 
 
 public interface TestApi {
-    public String test();
+    public String test() throws InterruptedException;
+
+    public int  startSleep();
 }

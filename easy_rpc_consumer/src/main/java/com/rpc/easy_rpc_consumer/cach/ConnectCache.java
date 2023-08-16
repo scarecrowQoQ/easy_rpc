@@ -10,11 +10,7 @@ public class ConnectCache {
     private final ConcurrentHashMap<String , ChannelFuture> connectCache = new ConcurrentHashMap<>();
 
     public ChannelFuture getChannelFuture(String address){
-        if(connectCache.contains(address)){
-            return connectCache.get(address);
-        }else {
-            return null;
-        }
+        return connectCache.get(address);
     }
     public void putChannelFuture(String address,ChannelFuture channelFuture){
         connectCache.put(address,channelFuture);

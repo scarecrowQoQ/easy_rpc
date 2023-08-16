@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,12 +41,12 @@ public class FuseProtector {
         return true;
     }
 
-    public void initCache(List<ServiceMeta> metas){
-        for (ServiceMeta meta : metas) {
-            String serviceName = meta.getServiceName();
+    public void initCache(ConcurrentHashMap<String, List<ServiceMeta>> serviceList){
+        for (String serviceName : serviceList.keySet()) {
             ServiceState serviceState = new ServiceState(serviceName);
-            serviceStateCache.put(serviceName,serviceState);
+                serviceStateCache.put(serviceName,serviceState);
         }
+
     }
     @Async
     public void increaseRequest(String serviceName){
@@ -55,7 +56,6 @@ public class FuseProtector {
 
     public void increaseExcepts(String serviceName){
         ServiceState serviceState = serviceStateCache.get(serviceName);
-
-
+        serviceState.incrExcepts();
     }
 }

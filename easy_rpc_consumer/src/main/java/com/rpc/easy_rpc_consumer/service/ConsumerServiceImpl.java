@@ -14,7 +14,6 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -55,11 +54,13 @@ public class ConsumerServiceImpl implements ConsumerService{
      */
     @Override
     public Object sendRequest(ConsumeRequest consumeRequest) {
+        String serviceName = consumeRequest.getServiceName();
         /**
          * 检查服务状态，是否进行熔断
          */
-        boolean isAvailable = fuseProtector.checkService(consumeRequest.getServiceName());
+        boolean isAvailable = fuseProtector.checkService(serviceName);
         if(!isAvailable){
+            log.info("请求熔断");
             return null;
         }
         String requestId = consumeRequest.getRequestId();
@@ -75,19 +76,28 @@ public class ConsumerServiceImpl implements ConsumerService{
         ChannelFuture channelFuture = connectTargetService(providerHost, providerPort);
         if(channelFuture != null){
             Channel channel = channelFuture.channel();
+            if (!channel.isActive()) {
+                log.info("远程服务掉线！ 地址"+providerHost+":"+providerHost);
+//                剔除缓存中的ChannelFuture
+                connectCache.removeChannelFuture(providerHost+":"+providerHost);
+                return null;
+            }
             Promise<ProviderResponse> promise = new DefaultPromise<>(new DefaultEventLoop());
             responseCache.putPromise(requestId,promise);
             RpcRequestHolder requestHolder = new RpcRequestHolder(header,consumeRequest);
             try {
-                channel.writeAndFlush(requestHolder);
-                ProviderResponse result = promise.get(1000l, TimeUnit.SECONDS);
+                channel.writeAndFlush(requestHolder).sync();
+                ProviderResponse result = promise.get(2, TimeUnit.SECONDS);
                 responseCache.removeResponse(requestId);
                 log.info("执行结果响应："+result.toString());
+                fuseProtector.increaseRequest(serviceName);
                 return result.getResult();
             }catch (Exception e){
-                e.printStackTrace();
                 if(e instanceof TimeoutException){
-
+                    log.info("连接超时");
+                    fuseProtector.increaseExcepts(serviceName);
+                }else {
+                    e.printStackTrace();
                 }
             }
         }
@@ -122,6 +132,7 @@ public class ConsumerServiceImpl implements ConsumerService{
         channelFuture = connectCache.getChannelFuture(address);
         if(channelFuture == null){
             try {
+                log.info("开始连接");
                 channelFuture = bootstrap.connect(host, port).sync();
             }catch (Exception e){
                 log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);

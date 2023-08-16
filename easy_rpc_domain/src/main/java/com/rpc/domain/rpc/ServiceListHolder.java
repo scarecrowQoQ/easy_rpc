@@ -19,6 +19,8 @@ public class ServiceListHolder implements Serializable {
 
     private  ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
 
+
+
     public void addService(List<ServiceMeta> metas){
         for (ServiceMeta meta : metas) {
             String serviceName = meta.getServiceName();
@@ -30,6 +32,7 @@ public class ServiceListHolder implements Serializable {
     }
 
     public void updateService(ConcurrentHashMap<String, List<ServiceMeta>> newServiceList){
+
         this.serviceList = newServiceList;
     }
 
