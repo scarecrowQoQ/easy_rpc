@@ -1,15 +1,15 @@
-package com.rpc.provider_demo.api;
+package com.example.provider_demo2.api;
 
 import com.rpc.easy_rpc_provider.annotation.EasyRpcProvider;
 import org.springframework.stereotype.Service;
 
-@EasyRpcProvider(serviceName = "test")
+@EasyRpcProvider(serviceName = "order")
 @Service
 public class TestApiImpl implements TestApi{
     private int flag = 0;
     @Override
-    public String test() throws InterruptedException {
-        System.out.println("服务1");
+    public String getOrder() throws InterruptedException {
+        System.out.println("getOrder方法执行");
         if(flag == 1){
             Thread.sleep(4000);
         }

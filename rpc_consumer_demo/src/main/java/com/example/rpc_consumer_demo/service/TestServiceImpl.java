@@ -1,11 +1,7 @@
 package com.example.rpc_consumer_demo.service;
 
 import com.example.rpc_consumer_demo.fuse.TestFuse;
-import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.utils.SpringContextUtil;
 import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +12,8 @@ public class TestServiceImpl{
     @RpcConsumer(serviceName = "test", fallback = TestFuse.class)
     private TestService testService;
 
+    @RpcConsumer(serviceName = "order")
+    private order order;
 
     @RequestMapping("/test")
     public void test()  {
@@ -23,9 +21,21 @@ public class TestServiceImpl{
        System.out.println("test="+test);
    }
 
+    @RequestMapping("/order")
+    public void getOrder()  {
+        String test = order.getOrder();
+        System.out.println("test="+test);
+    }
+
     @RequestMapping("/sleep")
     public void sleep()  {
        testService.startSleep();
+        System.out.println("开启睡眠");
+    }
+
+    @RequestMapping("/ordersleep")
+    public void ordersleep()  {
+        order.startSleep();
         System.out.println("开启睡眠");
     }
 }

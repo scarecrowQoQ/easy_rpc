@@ -9,7 +9,7 @@ public class TestApiImpl implements TestApi{
     private int flag = 0;
     @Override
     public String test() throws InterruptedException {
-        System.out.println("服务1");
+        System.out.println("服务2");
         if(flag == 1){
             Thread.sleep(4000);
         }

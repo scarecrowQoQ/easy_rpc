@@ -42,7 +42,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
-
         RequestType type = commonHeader.getType();
         if(type.equals(RequestType.RESPONSE_SERVICE)){
             ProviderResponse providerResponse = (ProviderResponse) requestHolder.getData();

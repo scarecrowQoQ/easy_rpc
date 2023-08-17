@@ -3,22 +3,21 @@ package com.rpc.easy_rpc_consumer.fuse;
 import com.rpc.domain.rpc.ServiceListHolder;
 import com.rpc.domain.rpc.ServiceMeta;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.Resource;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 @Component
 @Data
+@Slf4j
 public class FuseProtector {
 
     private ConcurrentHashMap<String, ServiceState> serviceStateCache = new ConcurrentHashMap<>();
-
-    private float k = 1.5f;
 
     @Resource
     ServiceListHolder serviceListHolder;
@@ -46,7 +45,6 @@ public class FuseProtector {
             ServiceState serviceState = new ServiceState(serviceName);
                 serviceStateCache.put(serviceName,serviceState);
         }
-
     }
     @Async
     public void increaseRequest(String serviceName){
@@ -57,5 +55,13 @@ public class FuseProtector {
     public void increaseExcepts(String serviceName){
         ServiceState serviceState = serviceStateCache.get(serviceName);
         serviceState.incrExcepts();
+    }
+
+    @Scheduled(cron="0/10 * *  * * ? ")
+    public void refreshCache(){
+        log.info("刷新熔断器");
+        for (String serviceName : serviceStateCache.keySet()) {
+            serviceStateCache.put(serviceName,new ServiceState(serviceName));
+        }
     }
 }

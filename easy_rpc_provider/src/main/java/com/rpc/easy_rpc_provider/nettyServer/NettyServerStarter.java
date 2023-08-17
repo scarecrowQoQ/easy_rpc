@@ -40,12 +40,6 @@ public class NettyServerStarter {
     @Resource
     ProviderHandler providerHandler;
 
-    @Resource
-    NettyDecoder nettyDecoder;
-
-    @Resource
-    NettyEncoder nettyEncoder;
-
     public void start() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         try {

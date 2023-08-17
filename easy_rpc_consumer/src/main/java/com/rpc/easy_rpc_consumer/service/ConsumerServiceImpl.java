@@ -65,6 +65,10 @@ public class ConsumerServiceImpl implements ConsumerService{
         }
         String requestId = consumeRequest.getRequestId();
         List<ServiceMeta> services = serviceListHolder.getService(consumeRequest.getServiceName());
+        if(services.size() == 0){
+            log.error("没有可用服务!");
+            return null;
+        }
         log.info("当前可选服务"+services);
         ServiceMeta service = loadBalancer.selectService(services);
         log.info("当前选择服务"+service.toString());

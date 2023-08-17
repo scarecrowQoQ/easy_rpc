@@ -53,7 +53,6 @@ public class ServiceState {
                 this.fuseState = FuseState.CLOSE;
             }
         }
-
     }
 
     public void incrExcepts(){
