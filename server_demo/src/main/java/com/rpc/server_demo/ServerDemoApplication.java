@@ -8,9 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableEasyRPC
 public class ServerDemoApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ServerDemoApplication.class, args);
     }
-
 }

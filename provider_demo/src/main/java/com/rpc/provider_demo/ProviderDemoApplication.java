@@ -11,9 +11,7 @@ import javax.annotation.Resource;
 @SpringBootApplication
 @EnableRpcProvider
 public class ProviderDemoApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ProviderDemoApplication.class, args);
     }
-
 }

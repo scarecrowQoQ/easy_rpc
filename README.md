@@ -2,7 +2,152 @@
 
 ​	EASY_RPC  使用 netty  高可用的主从Reactor多线程模型 搭建服务器，底层使用NIO减少连接时产生的资源损耗。其内部包含熔断器，负载均衡器，注册中心等等模块，可由用户手动自定义配置。
 
-​
+
+
+## 快速开始
+
+#### 创建一个注册中心
+
+	* **引入依赖:**
+
+``` 
+<dependency>
+            <groupId>com.example</groupId>
+            <artifactId>easy_rpc_core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+	* **创建一个模块，无需任何其他依赖**
+
+![image-20230817214028719](C:\Users\dct\AppData\Roaming\Typora\typora-user-images\image-20230817214028719.png)
+
+		* **在启动类上开启注册中心服务** 
+
+```
+@SpringBootApplication
+@EnableEasyRPC
+public class ServerDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ServerDemoApplication.class, args);
+    }
+}
+```
+
+* **编写配置文件（以yaml文件为例）**
+
+```
+rpc:
+  server:
+    host: 127.0.0.1
+    port: 8344
+```
+
+* 然后点击运行即可（如下即开启成功）
+* ![image-20230817214238148](C:\Users\dct\AppData\Roaming\Typora\typora-user-images\image-20230817214238148.png)
+
+#### 创建一个服务提供者
+
+ - **引入依赖**
+
+- ```
+  <dependency>
+      <groupId>com.example</groupId>
+      <artifactId>easy_rpc_provider</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+  </dependency>
+  ```
+
+
+
+ * **开启服务提供机制**
+
+* ```
+  @SpringBootApplication
+  @EnableRpcProvider
+  public class ProviderDemoApplication {
+      public static void main(String[] args) {
+          SpringApplication.run(ProviderDemoApplication.class, args);
+      }
+  }
+  ```
+
+ * 创建一个服务实现类，给定服务名，完成创建
+
+   ```
+   @EasyRpcProvider(serviceName = "test")
+   @Service
+   public class TestApiImpl implements TestApi{
+       @Override
+       public String test() throws InterruptedException {
+           System.out.println("服务1");
+           return "调用成功1";
+       }
+   }
+   ```
+
+#### 创建服务消费者
+
+* **引入依赖**
+
+* ```
+  <dependency>
+      <groupId>com.example</groupId>
+      <artifactId>easy_rpc_consumer</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+  </dependency>
+  
+  ```
+
+
+
+  * **开启服务消费功能**
+
+* ```
+  @SpringBootApplication
+  @EnableRpcConsumer
+  public class RpcConsumerDemoApplication {
+      public static void main(String[] args) {
+          SpringApplication.run(RpcConsumerDemoApplication.class, args);
+      }
+  }
+  ```
+
+
+
+* **编写接口**
+
+* ```
+  public interface TestService {
+      public String test();
+  }
+  ```
+
+
+
+* **创建服务调用类，引入接口，添加服务名，同时可以指定降级类用于熔断时的降级**
+
+* ```
+  @RestController
+  public class TestServiceImpl {
+  
+      @RpcConsumer(serviceName = "test", fallback = TestFuse.class)
+      private TestService testService;
+  
+      @RequestMapping("/test")
+      public void test() {
+          String test = testService.test();
+          System.out.println("test=" + test);
+      }
+  }
+  
+  ```
+
+
+
+### 即可开启整个服务调用
+
+
 
 ## EASY_RPC 架构说明（以下为主要部分）
 
@@ -25,7 +170,7 @@
     - rpc： 传输包，定义类传输类及其结构，其传输载体为RpcRequestHolder,包含一个CommonHeader 以及 data  规范为 比如提供者响应包，服务调用者请求包，服务列表发送包。
     - serialization：序列化包，包含一个序列化工厂，以及序列化接口和实现类
 
-​
+
 
 
 

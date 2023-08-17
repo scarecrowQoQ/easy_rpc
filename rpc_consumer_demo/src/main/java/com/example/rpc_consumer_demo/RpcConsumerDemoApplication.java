@@ -11,5 +11,4 @@ public class RpcConsumerDemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(RpcConsumerDemoApplication.class, args);
     }
-
 }
