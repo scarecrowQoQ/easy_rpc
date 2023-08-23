@@ -1,7 +1,10 @@
 package com.example.rpc_consumer_demo.service;
 
+import com.example.rpc_consumer_demo.entity.Person;
 import com.example.rpc_consumer_demo.fuse.TestFuse;
+import com.rpc.domain.limit.limitAnnotation.LimitingStrategy;
 import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,10 +24,11 @@ public class TestServiceImpl{
        System.out.println("test="+test);
    }
 
+
     @RequestMapping("/order")
-    public void getOrder()  {
-        String test = order.getOrder();
-        System.out.println("test="+test);
+    @LimitingStrategy(strategyName = "test",limitKey = "id")
+    public void getOrder( Person p)  {
+        System.out.println("执行放行");
     }
 
     @RequestMapping("/sleep")

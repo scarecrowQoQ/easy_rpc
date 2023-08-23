@@ -59,7 +59,6 @@ public class FuseProtector {
 
     @Scheduled(cron="0/10 * *  * * ? ")
     public void refreshCache(){
-        log.info("刷新熔断器");
         for (String serviceName : serviceStateCache.keySet()) {
             serviceStateCache.put(serviceName,new ServiceState(serviceName));
         }
