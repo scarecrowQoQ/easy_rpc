@@ -17,6 +17,9 @@ public @interface LimitingStrategy {
     Class<?> fallBack() default void.class;
 //    拒绝策略,默认直接拒绝
     BlockStrategy BlockStrategy() default BlockStrategy.IMMEDIATE_REFUSE;
-
+//      限流请求的主键key，如用户的id
     String limitKey() default "";
+//    限流QPS
+    int QPS();
+
 }

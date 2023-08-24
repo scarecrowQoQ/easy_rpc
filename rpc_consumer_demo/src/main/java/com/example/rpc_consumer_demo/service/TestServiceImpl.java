@@ -26,7 +26,7 @@ public class TestServiceImpl{
 
 
     @RequestMapping("/order")
-    @LimitingStrategy(strategyName = "test",limitKey = "id")
+    @LimitingStrategy(strategyName = "test",limitKey = "id",QPS = 3)
     public void getOrder( Person p)  {
         System.out.println("执行放行");
     }

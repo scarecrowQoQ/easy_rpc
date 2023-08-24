@@ -7,13 +7,13 @@ import java.util.concurrent.atomic.LongAdder;
 
 @Data
 public class SampleEntity {
-
+//    键为limitKey
     private ConcurrentHashMap<Object,Integer> passMap;
-
+//    键为limitKey
     private ConcurrentHashMap<Object,Integer> blockMap;
-    
+//    整个样本窗口内的API的通过数量
     private AtomicInteger pass;
-
+//    整个样本窗口内的API的拒绝数量
     private AtomicInteger block;
 
     public SampleEntity() {

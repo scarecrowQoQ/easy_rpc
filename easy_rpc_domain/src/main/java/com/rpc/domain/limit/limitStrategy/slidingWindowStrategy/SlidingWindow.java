@@ -3,12 +3,10 @@ package com.rpc.domain.limit.limitStrategy.slidingWindowStrategy;
 import com.rpc.domain.limit.config.LimitConfig;
 import com.rpc.domain.limit.limitStrategy.LimitStrategy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
-@Component
 @Slf4j
 public class SlidingWindow implements LimitStrategy {
 //    滑动窗口时间
@@ -40,11 +38,6 @@ public class SlidingWindow implements LimitStrategy {
         return time - (time % windowIntervalInMs);
     }
 
-//    重置样本窗口的开始时间
-    private SampleWindow resetSampleWindow(SampleWindow sampleWindow,long startTime){
-        return sampleWindow.reset(startTime);
-    }
-
 //    判断当前样本窗口是否还在滑动窗口时间内
     private boolean isSampleWindowDeprecated(long time,SampleWindow sampleWindow){
         if(sampleWindow == null){
@@ -58,7 +51,7 @@ public class SlidingWindow implements LimitStrategy {
         int length = sampleWindowAtomicReferenceArray.length();
         for (int i = 0; i < length; i++) {
             SampleWindow sampleWindow = sampleWindowAtomicReferenceArray.get(i);
-            if(sampleWindow != null && !isSampleWindowDeprecated(time,sampleWindow)){
+            if(!isSampleWindowDeprecated(time,sampleWindow)){
                 res.add(sampleWindow);
             }
         }
@@ -116,7 +109,6 @@ public class SlidingWindow implements LimitStrategy {
             }
         }
     }
-
 
     @Override
     public int getQPS() {

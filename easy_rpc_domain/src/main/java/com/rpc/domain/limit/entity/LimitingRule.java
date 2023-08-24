@@ -1,20 +1,32 @@
 package com.rpc.domain.limit.entity;
 
-import com.rpc.domain.limit.handler.SelectLimitKey;
+import com.rpc.domain.limit.limitAnnotation.LimitingStrategy;
+import com.rpc.domain.limit.limitEnum.BlockStrategy;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
 public class LimitingRule {
 
     private String strategyName;
 
-    private int QPS;
+    Class<?> fallBack;
 
-    private SelectLimitKey selectLimitKey;
+    BlockStrategy BlockStrategy;
 
-    public LimitingRule(String strategyName,int QPS){
-        this.QPS = QPS;
+    private String limitKey;
+
+    private Object limitValue;
+
+    private int maxQPS;
+
+    public LimitingRule(LimitingStrategy limitingStrategy){
+        this.maxQPS = limitingStrategy.QPS();
+        this.strategyName = limitingStrategy.strategyName();
+        this.BlockStrategy = limitingStrategy.BlockStrategy();
+        this.fallBack = limitingStrategy.fallBack();
+        this.limitKey = limitingStrategy.limitKey();
     }
 
 }

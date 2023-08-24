@@ -1,47 +1,57 @@
 package com.rpc.domain.limit;
 
+import com.rpc.domain.limit.config.LimitConfig;
 import com.rpc.domain.limit.entity.LimitingRule;
-import com.rpc.domain.limit.handler.SelectLimitKey;
 import com.rpc.domain.limit.limitStrategy.LimitStrategy;
+import com.rpc.domain.limit.limitStrategy.slidingWindowStrategy.SlidingWindow;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.Resource;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 public class LimitProcess {
 
+    private ConcurrentHashMap<String,LimitStrategy> limitStrategyMap = new ConcurrentHashMap<>();
+
     @Resource
-    private LimitStrategy limitStrategy;
-
-    public boolean isPass(LimitingRule rule,Object key){
-        int Max_QPS = rule.getQPS();
-        String strategyName = rule.getStrategyName();
-        float curQPS = limitStrategy.getQPS(key);
-        if(curQPS<Max_QPS){
-            limitStrategy.incrPassCount(key);
-            return true;
-        }else {
-            limitStrategy.incrBlockCount(key);
-            return false;
-        }
-    }
-
+    LimitConfig limitConfig;
 
     public boolean isPass(LimitingRule rule){
-        int Max_QPS = rule.getQPS();
+        int Max_QPS = rule.getMaxQPS();
         String strategyName = rule.getStrategyName();
-        SelectLimitKey selectLimitKey = rule.getSelectLimitKey();
-        float curQPS = limitStrategy.getQPS();
-        if(curQPS<=Max_QPS){
-            limitStrategy.incrPassCount();
-            return true;
+        LimitStrategy limitStrategy = limitStrategyMap.getOrDefault(strategyName,new SlidingWindow(limitConfig));
+        float curQPS;
+        if (rule.getLimitValue() != null){
+            curQPS = limitStrategy.getQPS(rule.getLimitValue());
+            if(curQPS<=Max_QPS){
+                log.info("请求通过，当前QPS："+curQPS);
+                limitStrategy.incrPassCount(rule.getLimitValue());
+                limitStrategyMap.put(strategyName,limitStrategy);
+                return true;
+            }  else {
+                log.info("请求拒绝，当前QPS："+curQPS);
+                limitStrategy.incrBlockCount(rule.getLimitValue());
+                limitStrategyMap.put(strategyName,limitStrategy);
+                return false;
+            }
+
         }else {
-            limitStrategy.incrBlockCount();
-            return false;
+            curQPS = limitStrategy.getQPS();
+            if(curQPS<=Max_QPS){
+                log.info("请求通过，当前QPS："+curQPS);
+                limitStrategy.incrPassCount();
+                limitStrategyMap.put(strategyName,limitStrategy);
+                return true;
+            }else {
+                log.info("请求拒绝，当前QPS："+curQPS);
+                limitStrategy.incrBlockCount();
+                limitStrategyMap.put(strategyName,limitStrategy);
+                return false;
+            }
         }
+
     }
 
-    public float getCurQPS(){
-        return limitStrategy.getQPS();
-    }
 }

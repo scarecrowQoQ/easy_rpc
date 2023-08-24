@@ -2,7 +2,6 @@ package com.rpc.domain.limit.aspect;
 
 import com.rpc.domain.limit.LimitProcess;
 import com.rpc.domain.limit.entity.LimitingRule;
-import com.rpc.domain.limit.handler.SelectLimitKey;
 import com.rpc.domain.limit.limitAnnotation.LimitingStrategy;
 import com.rpc.domain.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -31,36 +30,33 @@ public class LimitAspect {
     public Object annotationAround(ProceedingJoinPoint jp) {
         Method method = ((MethodSignature) jp.getSignature()).getMethod();
         LimitingStrategy limitingStrategy = method.getAnnotation(LimitingStrategy.class);
-        String ruleName = limitingStrategy.strategyName();
-        LimitingRule rule = SpringContextUtil.getBean(ruleName, LimitingRule.class);
+        LimitingRule rule = new LimitingRule(limitingStrategy);
         String limitKeyName = limitingStrategy.limitKey();
-        float curQPS = limitProcess.getCurQPS();
         Object[] args = jp.getArgs();
-        for (Object arg : args) {
-            for (Field declaredField : arg.getClass().getDeclaredFields()) {
-                if(declaredField.getName().equals(limitKeyName)){
-                    try {
-                        declaredField.setAccessible(true);
-//                        SelectLimitKey selectLimitKey = rule.getSelectLimitKey();
-                        Object key = declaredField.get(arg);
-                        boolean pass = limitProcess.isPass(rule, key);
-                        if(pass){
-                            log.info("当前QPS="+curQPS+"，最大值"+rule.getQPS());
-                            return jp.proceed();
-                        }else {
-                            log.warn("该请求被拦截，准备进行降级处理。当前QPS="+curQPS);
-                            System.out.println("执行拦截");
-
-                            return null;
+//        如果设置了limitKey则查找属性名
+        if(!rule.getLimitKey().equals("")){
+            for (Object arg : args) {
+                for (Field declaredField : arg.getClass().getDeclaredFields()) {
+                    if(declaredField.getName().equals(limitKeyName)){
+                        try {
+//                            设置可访问性
+                            declaredField.setAccessible(true);
+//                            拿到值
+                            Object value = declaredField.get(arg);
+                            rule.setLimitValue(value);
+                            boolean pass = limitProcess.isPass(rule);
+                            if(pass){
+                                return jp.proceed();
+                            }else {
+                                return null;
+                            }
+                        } catch (Throwable e ){
+                            e.printStackTrace();
                         }
-
-                    } catch (Throwable e ){
-                        e.printStackTrace();
                     }
                 }
             }
         }
-        log.error("没有找到拦截key，进行api粒度QPS拦截");
         boolean pass = limitProcess.isPass(rule);
         if(pass){
             try {
@@ -69,7 +65,7 @@ public class LimitAspect {
                 throwable.printStackTrace();
             }
         }else {
-            log.info("已拦截该请求，当前QPS="+curQPS);
+            log.info("已拦截");
             return null;
         }
         return null;
