@@ -1,18 +1,14 @@
 package com.rpc.easy_rpc_core.nettyServer.handler;
 
 import com.rpc.domain.protocol.enum2.RequestType;
-import com.rpc.domain.rpc.CommonHeader;
-import com.rpc.domain.rpc.ServiceListHolder;
-import com.rpc.domain.rpc.RpcRequestHolder;
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.rpc.*;
+import com.rpc.easy_rpc_core.registry.RegistryServiceImpl;
 import io.netty.channel.*;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +16,12 @@ import java.util.List;
 @Component
 @Slf4j
 @ChannelHandler.Sharable
-public class NettyHandlerInit extends ChannelInboundHandlerAdapter {
+public class RegistryHandler extends ChannelInboundHandlerAdapter {
     
-    @Autowired
+    @Resource
     ServiceListHolder serviceListHolder;
+
+
 
     private static final List<Channel>consumerChannels = new ArrayList<>();
 
@@ -48,12 +46,20 @@ public class NettyHandlerInit extends ChannelInboundHandlerAdapter {
             }
         }
 //        是否获取服务列表
-        if(type.equals(RequestType.GET_SERVICE)){
+        else if(type.equals(RequestType.GET_SERVICE)){
             log.info("返回服务列表");
             consumerChannels.add(channel);
             CommonHeader header = new CommonHeader(RequestType.SEND_SERVICE);
             RpcRequestHolder res = new RpcRequestHolder(header,serviceListHolder);
             ctx.channel().writeAndFlush(res);
+        }
+//        是否为发送心跳
+        else if(type.equals(RequestType.SEND_HEARTBEAT)){
+            HeartBeat heartBeat = (HeartBeat) rpcRequestHolder.getData();
+            Long updateTime = heartBeat.getUpdateTime();
+            List<ServiceMeta> serviceMetas = providerChannels.get(channel);
+            serviceListHolder.updateServerTime(serviceMetas,updateTime);
+//            查找服务
         }
     }
 
@@ -73,8 +79,7 @@ public class NettyHandlerInit extends ChannelInboundHandlerAdapter {
                 RpcRequestHolder res = new RpcRequestHolder(header,serviceListHolder);
                 consumerChannel.writeAndFlush(res);
             }
-            System.out.println(serviceListHolder.getServiceList());
-            //            从服务提供者连接缓存中剔除
+//            从服务提供者连接缓存中剔除
             providerChannels.remove(channel);
         }
     }

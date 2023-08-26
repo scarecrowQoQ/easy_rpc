@@ -10,15 +10,18 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -26,15 +29,15 @@ import java.net.InetSocketAddress;
 
 @Configuration
 @Data
-@Component
+@Slf4j
 public class NettyConfig {
-
 
     @Resource
     RpcProperties.provider provider;
 
     @Resource
     ProviderHandler providerHandler;
+
 
     @Bean
     public Bootstrap Bootstrap(){
@@ -52,30 +55,5 @@ public class NettyConfig {
         return bs;
     }
 
-    @Bean
-    public ServerBootstrap serverBootstrap(){
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline()
-                                    .addLast("decode",new NettyDecoder())
-                                    .addLast("encode",new NettyEncoder())
-                                    .addLast(providerHandler);
-                        }
-                    });
-
-        return serverBootstrap;
-    }
-    @Bean(name = "bossGroup")
-    public EventLoopGroup BossGroup(){
-        return new NioEventLoopGroup(1);
-    }
-
-    @Bean(name = "workerGroup")
-    public EventLoopGroup WorkerGroup(){
-        return new NioEventLoopGroup(12);
-    }
 
 }

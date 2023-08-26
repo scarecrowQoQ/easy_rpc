@@ -3,7 +3,7 @@ import com.rpc.domain.rpc.CommonHeader;
 import com.rpc.domain.config.RpcProperties;
 import com.rpc.domain.protocol.enum2.RequestType;
 import com.rpc.domain.rpc.*;
-import com.rpc.easy_rpc_consumer.cach.ConnectCache;
+import com.rpc.domain.cach.ConnectCache;
 import com.rpc.easy_rpc_consumer.cach.ResponseCache;
 import com.rpc.domain.rpc.ServiceListHolder;
 import com.rpc.easy_rpc_consumer.fuse.FuseProtector;
@@ -69,9 +69,8 @@ public class ConsumerServiceImpl implements ConsumerService{
             log.error("没有可用服务!");
             return null;
         }
-        log.info("当前可选服务"+services);
+//        负载均衡选择
         ServiceMeta service = loadBalancer.selectService(services);
-        log.info("当前选择服务"+service.toString());
         String providerHost = service.getServiceHost();
         int providerPort = service.getServicePort();
         String beanName = service.getBeanName();
@@ -93,7 +92,6 @@ public class ConsumerServiceImpl implements ConsumerService{
                 channel.writeAndFlush(requestHolder).sync();
                 ProviderResponse result = promise.get(2, TimeUnit.SECONDS);
                 responseCache.removeResponse(requestId);
-                log.info("执行结果响应："+result.toString());
                 fuseProtector.increaseRequest(serviceName);
                 return result.getResult();
             }catch (Exception e){
@@ -136,7 +134,6 @@ public class ConsumerServiceImpl implements ConsumerService{
         channelFuture = connectCache.getChannelFuture(address);
         if(channelFuture == null){
             try {
-                log.info("开始连接");
                 channelFuture = bootstrap.connect(host, port).sync();
             }catch (Exception e){
                 log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);

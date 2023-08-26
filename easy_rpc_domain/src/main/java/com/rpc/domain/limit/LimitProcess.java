@@ -25,7 +25,7 @@ public class LimitProcess {
         float curQPS;
         if (rule.getLimitValue() != null){
             curQPS = limitStrategy.getQPS(rule.getLimitValue());
-            if(curQPS<=Max_QPS){
+            if(curQPS<Max_QPS){
                 log.info("请求通过，当前QPS："+curQPS);
                 limitStrategy.incrPassCount(rule.getLimitValue());
                 limitStrategyMap.put(strategyName,limitStrategy);

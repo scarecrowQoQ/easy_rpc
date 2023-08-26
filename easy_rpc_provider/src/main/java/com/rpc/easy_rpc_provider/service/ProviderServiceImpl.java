@@ -1,14 +1,16 @@
 package com.rpc.easy_rpc_provider.service;
 
+import com.rpc.domain.cach.ConnectCache;
 import com.rpc.domain.config.RpcProperties;
 import com.rpc.domain.rpc.*;
 import com.rpc.domain.utils.SpringContextUtil;
 import com.rpc.domain.protocol.enum2.RequestType;
+import com.rpc.domain.rpc.HeartBeat;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.reflect.FastClass;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
@@ -19,13 +21,17 @@ import java.util.List;
 @Slf4j
 public class ProviderServiceImpl implements ProviderService {
 
-    @Autowired
+    @Resource
     Bootstrap bootstrap;
 
     @Resource
     RpcProperties.RPCServer server;
 
+    @Resource
+    ConnectCache connectCache;
+
     private List<ServiceMeta> serviceMetas = new ArrayList<>();
+
 
     @Override
     public Boolean registerService() {
@@ -37,7 +43,6 @@ public class ProviderServiceImpl implements ProviderService {
             try {
                 CommonHeader commonHeader = new CommonHeader(RequestType.SEND_SERVICE);
                 RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMetas);
-                log.info("开始发送消息");
                 channelFuture.channel().writeAndFlush(requestHolder);
             }catch (Exception e){
                 e.printStackTrace();
@@ -45,15 +50,32 @@ public class ProviderServiceImpl implements ProviderService {
         }
         return true;
     }
+
     @Override
     public void addServiceMeta(ServiceMeta serviceMeta){
         this.serviceMetas.add(serviceMeta);
     }
 
+    @Scheduled(cron="0/5 * *  * * ? ")
     @Override
-    public Boolean sendHeart() {
-        return null;
+    public void sendHeart() {
+        CommonHeader header = new CommonHeader(RequestType.SEND_HEARTBEAT);
+        HeartBeat heartBeat = new HeartBeat();
+        RpcRequestHolder requestHolder = new RpcRequestHolder(header,heartBeat);
+        ChannelFuture channelFuture = connectTargetService(server.getHost(), server.getPort());
+        if(channelFuture!=null){
+            try {
+                channelFuture.channel().writeAndFlush(requestHolder).sync();
+                log.info("心跳发送成功");
+            }catch (Exception e){
+                log.error("心跳发送失败");
+                e.printStackTrace();
+            }
+        }else {
+            log.error("与注册中心失去联系！心跳发送失败");
+        }
     }
+
     /**
      * 核心！
      * 此方法实现响应数据，即执行服务提供者的业务代码然后返回给调用者
@@ -62,9 +84,7 @@ public class ProviderServiceImpl implements ProviderService {
      * 2： 解析 RpcRequestHolder, 拿出消费请求体中的参数
      * 3： 根据请求体中beanName来注入服务业务类并生成代理对象
      * 4： 执行代理方法返回结果，封装结果发送数据
-     *
      */
-
     @Override
     public  RpcRequestHolder responseConsume(ConsumeRequest consumeRequest) {
         // 提取消费请求中的参数，包括标识id，服务方beanName，方法名，参数类型，参数值
@@ -104,17 +124,23 @@ public class ProviderServiceImpl implements ProviderService {
      * @return
      */
     private ChannelFuture connectTargetService(String host,int port) {
+        String address = host + ":" + port;
         ChannelFuture channelFuture = null;
-        try {
-            channelFuture = bootstrap.connect(host, port).sync();
-        } catch (Exception e) {
-            log.error("连接失败，请检查服务端是否开启,host="+host+",port="+port);
-            e.printStackTrace();
+        channelFuture = connectCache.getChannelFuture(address);
+        if(channelFuture == null){
+            try {
+                channelFuture = bootstrap.connect(host, port).sync();
+            }catch (Exception e){
+                log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);
+                e.printStackTrace();
+                return null;
+            }
         }
-        if (channelFuture != null && channelFuture.isSuccess()) {
-            log.info("注册中心连接成功");
+        if (channelFuture!=null && channelFuture.isSuccess()) {
+            connectCache.putChannelFuture(address,channelFuture);
+            log.info("连接成功,目标Host:"+host+"port:"+port);
             return channelFuture;
-        } else {
+        }else {
             return null;
         }
     }

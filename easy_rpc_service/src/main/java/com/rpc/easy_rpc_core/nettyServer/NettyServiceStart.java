@@ -1,7 +1,7 @@
 package com.rpc.easy_rpc_core.nettyServer;
 
 import com.rpc.domain.config.RpcProperties;
-import com.rpc.easy_rpc_core.nettyServer.handler.NettyHandlerInit;
+import com.rpc.easy_rpc_core.nettyServer.handler.RegistryHandler;
 import com.rpc.domain.protocol.coder.NettyDecoder;
 import com.rpc.domain.protocol.coder.NettyEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -17,32 +17,25 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
-@ComponentScan("com.rpc.easy_rpc_core")
+@ComponentScan({"com.rpc.easy_rpc_core","dom.rpc.domain"})
+@EnableScheduling
 @Slf4j
 public class NettyServiceStart implements Runnable, InitializingBean {
 
     @Autowired
     RpcProperties.RPCServer rpcServer;
 
-    @Resource
-    NettyHandlerInit httpHandlerInit;
-
     @Resource()
     @Qualifier("taskExecutor")
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Resource
-    NettyHandlerInit nettyHandlerInit;
-
-    @Resource
-    NettyDecoder nettyDecoder;
-
-    @Resource
-    NettyEncoder nettyEncoder;
+    RegistryHandler nettyHandlerInit;
 
     @SneakyThrows
     @Override
@@ -60,8 +53,6 @@ public class NettyServiceStart implements Runnable, InitializingBean {
                             socketChannel.pipeline()
                                     .addLast("decode",new NettyDecoder())
                                     .addLast("encode",new NettyEncoder())
-//                                    .addLast("decode",nettyDecoder)
-//                                    .addLast("encode",nettyEncoder)
                                     .addLast(nettyHandlerInit);
                         }
                     });

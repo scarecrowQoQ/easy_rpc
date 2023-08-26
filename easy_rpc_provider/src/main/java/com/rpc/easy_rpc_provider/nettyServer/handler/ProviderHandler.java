@@ -23,9 +23,8 @@ public class ProviderHandler extends SimpleChannelInboundHandler<RpcRequestHolde
     ProviderService registerService;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcRequestHolder requestHolder) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcRequestHolder requestHolder){
         CommonHeader commonHeader = requestHolder.getCommonHeader();
-
         if (commonHeader.getType().equals(RequestType.CONSUME_SERVICE)) {
             ConsumeRequest consumeRequest = (ConsumeRequest) requestHolder.getData();
             RpcRequestHolder response = registerService.responseConsume(consumeRequest);

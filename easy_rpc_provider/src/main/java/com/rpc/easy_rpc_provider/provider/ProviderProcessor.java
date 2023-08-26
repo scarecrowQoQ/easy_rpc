@@ -11,6 +11,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ import java.util.List;
 /**
  * 服务提供者进程，主要开启服务响应功能
  */
-@ComponentScan("com.rpc")
-public class ProviderProcessor implements InitializingBean, EnvironmentAware {
+@ComponentScan({"com.rpc.easy_rpc_provider", "com.rpc.domain"})
+public class ProviderProcessor implements InitializingBean {
 
     @Resource
     NettyServerStarter nettyServerStarter;
@@ -32,11 +33,8 @@ public class ProviderProcessor implements InitializingBean, EnvironmentAware {
     @Override
     public void afterPropertiesSet() throws Exception {
         nettyServerStarter.start();
-
-    }
-
-    @Override
-    public void setEnvironment(Environment environment) {
         providerService.registerService();
     }
+
+
 }

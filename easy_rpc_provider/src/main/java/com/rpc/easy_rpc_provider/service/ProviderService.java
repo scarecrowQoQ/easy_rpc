@@ -17,9 +17,9 @@ public interface ProviderService {
     /**
      * heartBeat 心跳机制
      */
-    Boolean sendHeart();
+    void sendHeart();
     /**
      * 返回消费请求
      */
-    RpcRequestHolder   responseConsume(ConsumeRequest consumeRequest);
+    RpcRequestHolder responseConsume(ConsumeRequest consumeRequest);
 }

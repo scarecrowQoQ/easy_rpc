@@ -1,4 +1,4 @@
-package com.rpc.easy_rpc_consumer.cach;
+package com.rpc.domain.cach;
 
 import io.netty.channel.ChannelFuture;
 import org.springframework.stereotype.Component;

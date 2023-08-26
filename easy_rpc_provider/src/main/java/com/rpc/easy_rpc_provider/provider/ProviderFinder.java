@@ -9,6 +9,8 @@ import lombok.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @Configuration
 @Data
+@EnableScheduling
 public class ProviderFinder implements BeanPostProcessor{
 
     @Resource
@@ -26,8 +29,6 @@ public class ProviderFinder implements BeanPostProcessor{
 
     @Resource
     ProviderService providerService;
-
-    private List<ServiceMeta> serviceMetas = new ArrayList<>();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean,@NonNull String beanName) throws BeansException {

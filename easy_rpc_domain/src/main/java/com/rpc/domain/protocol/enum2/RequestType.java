@@ -8,5 +8,8 @@ public enum RequestType {
 //    消费服务
      CONSUME_SERVICE,
 //    响应服务
-    RESPONSE_SERVICE
+    RESPONSE_SERVICE,
+//    发送心跳
+    SEND_HEARTBEAT
+
 }

@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
 
-@ComponentScan("com.rpc")
+@ComponentScan({"com.rpc.easy_rpc_consumer", "com.rpc.domain"})
 public class ConsumerProcessor implements InitializingBean{
 
     @Resource
