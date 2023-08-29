@@ -17,8 +17,6 @@ public class ConnectCache {
     }
 
     public void removeChannelFuture(String address){
-        if(connectCache.contains(address)){
-            connectCache.remove(address);
-        }
+        connectCache.remove(address);
     }
 }

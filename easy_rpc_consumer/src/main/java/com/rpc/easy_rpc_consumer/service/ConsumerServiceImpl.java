@@ -24,7 +24,7 @@ public class ConsumerServiceImpl implements ConsumerService{
     Bootstrap bootstrap;
 
     @Resource
-    RpcProperties.RPCServer server;
+    RpcProperties.RpcRegistry server;
 
     @Resource
     ServiceListHolder serviceListHolder;
@@ -62,7 +62,7 @@ public class ConsumerServiceImpl implements ConsumerService{
             return null;
         }
         String requestId = consumeRequest.getRequestId();
-        List<ServiceMeta> services = serviceListHolder.getService(consumeRequest.getServiceName());
+        List<ServiceMeta> services = serviceListHolder.getServiceByName(consumeRequest.getServiceName());
         if(services.size() == 0){
             log.error("没有可用服务!");
             return null;

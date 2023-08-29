@@ -51,7 +51,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             ServiceListHolder newServiceListHolder = (ServiceListHolder) requestHolder.getData();
             log.info("成功获取到服务列表"+newServiceListHolder.toString());
             fuseProtector.initCache(newServiceListHolder.getServiceList());
-            serviceListHolder.updateService(newServiceListHolder.getServiceList());
+            serviceListHolder.setServiceList(newServiceListHolder.getServiceList());
         }
     }
 

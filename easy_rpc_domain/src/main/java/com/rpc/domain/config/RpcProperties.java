@@ -22,9 +22,9 @@ public class RpcProperties {
      * 此为客户端(服务提供者)配置
      */
     @Data
-    @Component
+    @Component("RpcProvider")
     @ConfigurationProperties(prefix = "rpc.provider")
-    public static class provider{
+    public static class RpcProvider {
         /**
          * 服务提供运行主机
          */
@@ -43,7 +43,7 @@ public class RpcProperties {
      * 此为消费者配置
      */
     @Data
-    @Component
+    @Component("RPCConsumer")
     @ConfigurationProperties(prefix = "rpc.consumer")
     public static class RPCConsumer{
         /**
@@ -64,9 +64,9 @@ public class RpcProperties {
      * 此为注册中心配置
      */
     @Data
-    @Component
+    @Component("RpcRegistry")
     @ConfigurationProperties(prefix = "rpc.registry")
-    public static class RPCServer{
+    public static class RpcRegistry {
         /**
          * 注册中心运行ip
          */
@@ -78,9 +78,9 @@ public class RpcProperties {
         public int port;
 
         /**
-         * 服务过期时间,默认12秒
+         * 服务过期时间,默认6秒
          */
-        public int serviceSaveTime = 12;
+        public Long serviceSaveTime = 6000L;
     }
 
 

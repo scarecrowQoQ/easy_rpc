@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 public class ProviderFinder implements BeanPostProcessor{
 
     @Resource
-    RpcProperties.provider provider;
+    RpcProperties.RpcProvider provider;
 
     @Resource
     ProviderService providerService;

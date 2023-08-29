@@ -5,27 +5,16 @@ import com.rpc.domain.protocol.coder.NettyDecoder;
 import com.rpc.domain.protocol.coder.NettyEncoder;
 import com.rpc.easy_rpc_provider.nettyServer.handler.ProviderHandler;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.net.InetSocketAddress;
 
 @Configuration
 @Data
@@ -33,7 +22,7 @@ import java.net.InetSocketAddress;
 public class NettyConfig {
 
     @Resource
-    RpcProperties.provider provider;
+    RpcProperties.RpcProvider provider;
 
     @Resource
     ProviderHandler providerHandler;

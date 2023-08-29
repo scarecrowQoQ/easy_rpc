@@ -28,9 +28,9 @@ import java.net.InetSocketAddress;
 public class NettyServiceStart implements Runnable, InitializingBean {
 
     @Autowired
-    RpcProperties.RPCServer rpcServer;
+    RpcProperties.RpcRegistry rpcServer;
 
-    @Resource()
+    @Resource
     @Qualifier("taskExecutor")
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
 

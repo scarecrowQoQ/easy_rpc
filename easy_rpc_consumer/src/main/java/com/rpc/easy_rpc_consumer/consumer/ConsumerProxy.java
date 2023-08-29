@@ -41,7 +41,7 @@ public class ConsumerProxy implements InvocationHandler{
         consumeRequest.setParameters(args);
         consumeRequest.setParameterTypes(method.getParameterTypes());
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
-        log.info("执行消费请求"+consumeRequest.toString());
+//        log.info("执行消费请求"+consumeRequest.toString());
         Object result = service.sendRequest(consumeRequest);
 //        如果成功响应（非熔断/拦截状态）
         if(result != null){

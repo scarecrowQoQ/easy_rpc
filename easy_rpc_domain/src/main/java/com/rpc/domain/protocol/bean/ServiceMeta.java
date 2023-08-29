@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 此类为注册服务实体类，包含一个远程服务的全部消息
@@ -37,4 +38,6 @@ public class ServiceMeta implements Serializable {
      * 活跃数即连接数（每次上传后重置为0）
      */
     private int actives;
+
+
 }

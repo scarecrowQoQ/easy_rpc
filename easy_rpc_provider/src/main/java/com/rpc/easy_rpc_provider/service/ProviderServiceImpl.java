@@ -24,12 +24,12 @@ public class ProviderServiceImpl implements ProviderService {
     Bootstrap bootstrap;
 
     @Resource
-    RpcProperties.RPCServer server;
+    RpcProperties.RpcRegistry server;
 
     @Resource
     ConnectCache connectCache;
 
-    private List<ServiceMeta> serviceMetas = new ArrayList<>();
+    private final List<ServiceMeta> serviceMetas = new ArrayList<>();
 
 
     @Override
@@ -42,6 +42,7 @@ public class ProviderServiceImpl implements ProviderService {
             try {
                 CommonHeader commonHeader = new CommonHeader(RequestType.SEND_SERVICE);
                 RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMetas);
+                log.info("注册服务");
                 channelFuture.channel().writeAndFlush(requestHolder);
             }catch (Exception e){
                 e.printStackTrace();
@@ -68,6 +69,8 @@ public class ProviderServiceImpl implements ProviderService {
                 log.info("心跳发送成功");
             }catch (Exception e){
                 log.error("心跳发送失败");
+//                清除连接缓存
+                connectCache.removeChannelFuture(server.getHost()+":"+server.getPort());
                 e.printStackTrace();
             }
         }else {
@@ -137,7 +140,6 @@ public class ProviderServiceImpl implements ProviderService {
         }
         if (channelFuture!=null && channelFuture.isSuccess()) {
             connectCache.putChannelFuture(address,channelFuture);
-            log.info("连接成功,目标Host:"+host+"port:"+port);
             return channelFuture;
         }else {
             return null;

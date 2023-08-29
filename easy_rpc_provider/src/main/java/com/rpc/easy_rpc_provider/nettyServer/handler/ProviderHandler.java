@@ -7,6 +7,7 @@ import com.rpc.domain.protocol.bean.ConsumeRequest;
 import com.rpc.domain.protocol.bean.RpcRequestHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -16,21 +17,23 @@ import javax.annotation.Resource;
 @Component
 @Slf4j
 @ChannelHandler.Sharable
-public class ProviderHandler extends SimpleChannelInboundHandler<RpcRequestHolder> {
+public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
     @Resource
     @Lazy
     ProviderService registerService;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcRequestHolder requestHolder){
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
-        if (commonHeader.getType().equals(RequestType.CONSUME_SERVICE)) {
+        RequestType type = commonHeader.getType();
+        if (type.equals(RequestType.CONSUME_SERVICE)) {
             ConsumeRequest consumeRequest = (ConsumeRequest) requestHolder.getData();
             RpcRequestHolder response = registerService.responseConsume(consumeRequest);
-            channelHandlerContext.writeAndFlush(response);
+            ctx.writeAndFlush(response);
+        }else if (type.equals(RequestType.GET_SERVICE)){
+            registerService.registerService();
         }
     }
-
-
 }
