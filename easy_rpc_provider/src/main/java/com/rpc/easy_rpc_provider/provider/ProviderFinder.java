@@ -1,7 +1,7 @@
 package com.rpc.easy_rpc_provider.provider;
 
 import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.protocol.bean.ServiceMeta;
 import com.rpc.easy_rpc_provider.annotation.EasyRpcProvider;
 import com.rpc.easy_rpc_provider.service.ProviderService;
 import lombok.Data;
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 实现服务注册功能，

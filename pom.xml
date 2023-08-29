@@ -8,6 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>easy_rpc_domain</module>
+        <module>demo</module>
+        <module>projectApi</module>
     </modules>
     <name>easy_rpc</name>
     <description>Demo project for Spring Boot</description>

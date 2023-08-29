@@ -1,7 +1,0 @@
-rpc:
-  provider:
-    host: 127.0.0.1
-    port: 8081
-  server:
-    host: 127.0.0.1
-    port: 8344

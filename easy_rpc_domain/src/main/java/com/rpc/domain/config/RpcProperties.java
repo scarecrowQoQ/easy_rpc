@@ -65,7 +65,7 @@ public class RpcProperties {
      */
     @Data
     @Component
-    @ConfigurationProperties(prefix = "rpc.server")
+    @ConfigurationProperties(prefix = "rpc.registry")
     public static class RPCServer{
         /**
          * 注册中心运行ip

@@ -2,9 +2,9 @@ package com.rpc.easy_rpc_provider.nettyServer.handler;
 
 import com.rpc.easy_rpc_provider.service.ProviderService;
 import com.rpc.domain.protocol.enum2.RequestType;
-import com.rpc.domain.rpc.CommonHeader;
-import com.rpc.domain.rpc.ConsumeRequest;
-import com.rpc.domain.rpc.RpcRequestHolder;
+import com.rpc.domain.protocol.bean.CommonHeader;
+import com.rpc.domain.protocol.bean.ConsumeRequest;
+import com.rpc.domain.protocol.bean.RpcRequestHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

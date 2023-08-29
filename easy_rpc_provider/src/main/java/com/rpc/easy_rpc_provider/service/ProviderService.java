@@ -1,8 +1,8 @@
 package com.rpc.easy_rpc_provider.service;
 
-import com.rpc.domain.rpc.ConsumeRequest;
-import com.rpc.domain.rpc.RpcRequestHolder;
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.protocol.bean.ConsumeRequest;
+import com.rpc.domain.protocol.bean.RpcRequestHolder;
+import com.rpc.domain.protocol.bean.ServiceMeta;
 
 public interface ProviderService {
     /**

@@ -1,0 +1,7 @@
+rpc:
+  registry:
+    port: 8344
+    host: 127.0.0.1
+  provider:
+    port: 8082
+    host: 127.0.0.1

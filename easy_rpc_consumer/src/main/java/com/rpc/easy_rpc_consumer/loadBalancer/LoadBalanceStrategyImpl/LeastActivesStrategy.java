@@ -1,6 +1,6 @@
 package com.rpc.easy_rpc_consumer.loadBalancer.LoadBalanceStrategyImpl;
 
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.protocol.bean.ServiceMeta;
 import com.rpc.easy_rpc_consumer.loadBalancer.LoadBalanceStrategy;
 import org.springframework.stereotype.Component;
 import java.util.Comparator;

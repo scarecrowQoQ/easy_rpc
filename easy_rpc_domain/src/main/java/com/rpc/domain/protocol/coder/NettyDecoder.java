@@ -2,7 +2,7 @@ package com.rpc.domain.protocol.coder;
 
 import com.rpc.domain.serialization.RpcSerialization;
 import com.rpc.domain.serialization.SerializationFactory;
-import com.rpc.domain.rpc.RpcRequestHolder;
+import com.rpc.domain.protocol.bean.RpcRequestHolder;
 import com.rpc.domain.utils.SpringContextUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

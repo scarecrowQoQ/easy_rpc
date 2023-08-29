@@ -1,17 +1,10 @@
 package com.rpc.easy_rpc_provider.provider;
 
-import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.utils.SpringContextUtil;
 import com.rpc.easy_rpc_provider.nettyServer.NettyServerStarter;
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.protocol.bean.ServiceMeta;
 import com.rpc.easy_rpc_provider.service.ProviderService;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.env.Environment;
-
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +24,7 @@ public class ProviderProcessor implements InitializingBean {
     private List<ServiceMeta> serviceMetas = new ArrayList<>();
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet(){
         nettyServerStarter.start();
         providerService.registerService();
     }

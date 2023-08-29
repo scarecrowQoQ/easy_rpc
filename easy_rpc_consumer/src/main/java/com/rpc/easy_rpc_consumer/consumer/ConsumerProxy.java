@@ -2,10 +2,9 @@ package com.rpc.easy_rpc_consumer.consumer;
 
 import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
 import com.rpc.easy_rpc_consumer.service.ConsumerService;
-import com.rpc.domain.rpc.ConsumeRequest;
+import com.rpc.domain.protocol.bean.ConsumeRequest;
 import com.rpc.domain.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.reflect.FastClass;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

@@ -1,7 +1,7 @@
 package com.rpc.easy_rpc_consumer.fuse;
 
-import com.rpc.domain.rpc.ServiceListHolder;
-import com.rpc.domain.rpc.ServiceMeta;
+import com.rpc.domain.protocol.bean.ServiceListHolder;
+import com.rpc.domain.protocol.bean.ServiceMeta;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -59,7 +59,6 @@ public class FuseProtector {
 
     @Scheduled(cron="0/10 * *  * * ? ")
     public void refreshCache(){
-        log.info("刷新");
         for (String serviceName : serviceStateCache.keySet()) {
             serviceStateCache.put(serviceName,new ServiceState(serviceName));
         }

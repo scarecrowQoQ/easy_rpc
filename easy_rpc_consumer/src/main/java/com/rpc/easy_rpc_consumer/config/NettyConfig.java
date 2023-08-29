@@ -1,6 +1,5 @@
 package com.rpc.easy_rpc_consumer.config;
 
-import com.rpc.domain.rpc.RpcRequestHolder;
 import com.rpc.easy_rpc_consumer.netServer.handler.ConsumerHandler;
 import com.rpc.domain.protocol.coder.NettyDecoder;
 import com.rpc.domain.protocol.coder.NettyEncoder;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Configuration

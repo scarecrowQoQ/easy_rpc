@@ -69,7 +69,7 @@ public class ServiceState {
         }else if(rate > 0.3f){
             log.info("切换至半开");
             this.fuseState = FuseState.HALF_OPEN;
-        }else if(rate > 0.9f){
+        }else if(rate > 0.7f){
             log.info("切换至全开");
             this.fuseState = FuseState.FALL_OPEN;
         }

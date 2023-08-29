@@ -26,7 +26,6 @@ public class LimitProcess {
         if (rule.getLimitValue() != null){
             curQPS = limitStrategy.getQPS(rule.getLimitValue());
             if(curQPS<Max_QPS){
-                log.info("请求通过，当前QPS："+curQPS);
                 limitStrategy.incrPassCount(rule.getLimitValue());
                 limitStrategyMap.put(strategyName,limitStrategy);
                 return true;
@@ -36,11 +35,9 @@ public class LimitProcess {
                 limitStrategyMap.put(strategyName,limitStrategy);
                 return false;
             }
-
         }else {
             curQPS = limitStrategy.getQPS();
-            if(curQPS<=Max_QPS){
-                log.info("请求通过，当前QPS："+curQPS);
+            if(curQPS<Max_QPS){
                 limitStrategy.incrPassCount();
                 limitStrategyMap.put(strategyName,limitStrategy);
                 return true;

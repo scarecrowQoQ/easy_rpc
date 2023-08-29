@@ -1,18 +1,15 @@
 package com.rpc.easy_rpc_consumer.netServer.handler;
 
 import com.rpc.domain.protocol.enum2.RequestType;
-import com.rpc.domain.rpc.CommonHeader;
-import com.rpc.domain.rpc.ProviderResponse;
+import com.rpc.domain.protocol.bean.CommonHeader;
+import com.rpc.domain.protocol.bean.ProviderResponse;
 import com.rpc.easy_rpc_consumer.cach.ResponseCache;
-import com.rpc.domain.rpc.ServiceListHolder;
+import com.rpc.domain.protocol.bean.ServiceListHolder;
 import com.rpc.easy_rpc_consumer.fuse.FuseProtector;
-import com.rpc.easy_rpc_consumer.service.ConsumerService;
-import com.rpc.domain.rpc.RpcRequestHolder;
+import com.rpc.domain.protocol.bean.RpcRequestHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.DefaultEventLoop;
-import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

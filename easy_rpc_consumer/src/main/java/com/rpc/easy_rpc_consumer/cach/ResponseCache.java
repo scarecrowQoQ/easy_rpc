@@ -1,18 +1,12 @@
 package com.rpc.easy_rpc_consumer.cach;
 
-import com.rpc.domain.rpc.ProviderResponse;
-import com.rpc.domain.rpc.RpcRequestHolder;
-import io.netty.channel.DefaultEventLoop;
-import io.netty.util.concurrent.DefaultPromise;
+import com.rpc.domain.protocol.bean.ProviderResponse;
 import io.netty.util.concurrent.Promise;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Data

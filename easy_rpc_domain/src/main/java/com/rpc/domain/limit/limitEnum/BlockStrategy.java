@@ -1,5 +1,8 @@
 package com.rpc.domain.limit.limitEnum;
 
+/**
+ * 拒绝策略
+ */
 public enum BlockStrategy {
 //    立即拒绝
     IMMEDIATE_REFUSE,
