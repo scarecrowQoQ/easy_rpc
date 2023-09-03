@@ -12,12 +12,9 @@ import java.util.UUID;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ConsumeRequest implements Serializable {
 
-    /**
-     * 本次请求标识ID
-     */
-    private String requestId;
     /**
      * 请求服务名
      */
@@ -39,10 +36,5 @@ public class ConsumeRequest implements Serializable {
      */
     private Object[] parameters;
 
-    public ConsumeRequest(){
-        long time = System.currentTimeMillis();
-        int random = (int) (Math.random() * Integer.MAX_VALUE);
-        UUID uuid = new UUID(time, random);
-        this.requestId = uuid.toString();
-    }
+
 }

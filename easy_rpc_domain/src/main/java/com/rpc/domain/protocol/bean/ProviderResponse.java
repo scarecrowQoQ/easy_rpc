@@ -10,10 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProviderResponse implements Serializable {
-    /**
-     * 响应ID
-     */
-    private String requestId;
+
     /**
      * 是否成功
      */

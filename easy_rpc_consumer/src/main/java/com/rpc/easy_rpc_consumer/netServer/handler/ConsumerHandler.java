@@ -40,9 +40,9 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
         RequestType type = commonHeader.getType();
+        String requestId = commonHeader.getRequestId();
         if(type.equals(RequestType.RESPONSE_SERVICE)){
             ProviderResponse providerResponse = (ProviderResponse) requestHolder.getData();
-            String requestId = providerResponse.getRequestId();
             Promise<ProviderResponse> promise = responseCache.getPromise(requestId);
             promise.setSuccess(providerResponse);
         }

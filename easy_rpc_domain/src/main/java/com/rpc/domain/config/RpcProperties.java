@@ -57,7 +57,11 @@ public class RpcProperties {
         /**
          * 服务拉取时间,默认12秒
          */
-        public int getServiceTime = 12;
+        public Integer getServiceTime = 12;
+        /**
+         * 消费等待时长
+         */
+        public Long consumeWaitInMs = 2000L;
     }
 
     /**
@@ -75,7 +79,7 @@ public class RpcProperties {
         /**
          * 注册中心运行端口
          */
-        public int port;
+        public Integer port;
 
         /**
          * 服务过期时间,默认6秒

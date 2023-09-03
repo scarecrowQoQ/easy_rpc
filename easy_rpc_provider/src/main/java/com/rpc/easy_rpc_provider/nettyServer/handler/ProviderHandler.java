@@ -1,5 +1,6 @@
 package com.rpc.easy_rpc_provider.nettyServer.handler;
 
+import com.rpc.domain.protocol.bean.ProviderResponse;
 import com.rpc.easy_rpc_provider.service.ProviderService;
 import com.rpc.domain.protocol.enum2.RequestType;
 import com.rpc.domain.protocol.bean.CommonHeader;
@@ -28,9 +29,12 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
         CommonHeader commonHeader = requestHolder.getCommonHeader();
         RequestType type = commonHeader.getType();
+        String requestId = commonHeader.getRequestId();
         if (type.equals(RequestType.CONSUME_SERVICE)) {
             ConsumeRequest consumeRequest = (ConsumeRequest) requestHolder.getData();
-            RpcRequestHolder response = registerService.responseConsume(consumeRequest);
+            ProviderResponse providerResponse = registerService.responseConsume(consumeRequest);
+            CommonHeader header = new CommonHeader(RequestType.RESPONSE_SERVICE,requestId);
+            RpcRequestHolder response = new RpcRequestHolder(header,providerResponse);
             ctx.writeAndFlush(response);
         }else if (type.equals(RequestType.GET_SERVICE)){
             registerService.registerService();

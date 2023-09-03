@@ -24,6 +24,7 @@ public class ConsumerProcessor implements InitializingBean{
 
     @Override
     public void afterPropertiesSet() throws Exception {
+//        服务列表拉取
         consumerService.getServiceList();
     }
 

@@ -40,6 +40,10 @@ public class ProviderServiceImpl implements ProviderService {
         ChannelFuture channelFuture = connectTargetService(host, port);
         if (channelFuture != null){
             try {
+//                获取最新时间
+                for (ServiceMeta serviceMeta : serviceMetas) {
+                    serviceMeta.setUpdateTime(System.currentTimeMillis());
+                }
                 CommonHeader commonHeader = new CommonHeader(RequestType.SEND_SERVICE);
                 RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMetas);
                 log.info("注册服务");
@@ -66,7 +70,6 @@ public class ProviderServiceImpl implements ProviderService {
         if(channelFuture!=null){
             try {
                 channelFuture.channel().writeAndFlush(requestHolder).sync();
-                log.info("心跳发送成功");
             }catch (Exception e){
                 log.error("心跳发送失败");
 //                清除连接缓存
@@ -88,12 +91,9 @@ public class ProviderServiceImpl implements ProviderService {
      * 4： 执行代理方法返回结果，封装结果发送数据
      */
     @Override
-    public  RpcRequestHolder responseConsume(ConsumeRequest consumeRequest) {
+    public  ProviderResponse responseConsume(ConsumeRequest consumeRequest) {
         // 提取消费请求中的参数，包括标识id，服务方beanName，方法名，参数类型，参数值
         ProviderResponse providerResponse = new ProviderResponse();
-        CommonHeader header = new CommonHeader(RequestType.RESPONSE_SERVICE);
-        String requestId = consumeRequest.getRequestId();
-        providerResponse.setRequestId(requestId);
         String beanName = consumeRequest.getBeanName();
         String methodName = consumeRequest.getMethodName();
         Class<?>[] parameterTypes = consumeRequest.getParameterTypes();
@@ -116,7 +116,7 @@ public class ProviderServiceImpl implements ProviderService {
             providerResponse.setCode(500);
             providerResponse.setIsSuccess(false);
         }
-        return new RpcRequestHolder(header,providerResponse);
+        return providerResponse;
     }
 
     /**

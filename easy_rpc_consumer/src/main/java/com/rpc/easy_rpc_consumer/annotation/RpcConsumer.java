@@ -19,4 +19,6 @@ public @interface RpcConsumer {
 
     String loadBalancer() default "loadBalancer";
 
+    boolean async() default false;
+
 }

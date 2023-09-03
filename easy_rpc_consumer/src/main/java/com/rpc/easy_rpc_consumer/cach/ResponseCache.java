@@ -24,9 +24,7 @@ public class ResponseCache {
     }
 
     public void removeResponse(String requestId){
-        if(responseCache.contains(requestId)){
-            responseCache.remove(requestId);
-        }
+        responseCache.remove(requestId);
     }
 
 }

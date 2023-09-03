@@ -4,10 +4,13 @@ import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
 import com.rpc.easy_rpc_consumer.service.ConsumerService;
 import com.rpc.domain.protocol.bean.ConsumeRequest;
 import com.rpc.domain.utils.SpringContextUtil;
+import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 public class ConsumerProxy implements InvocationHandler{
 
@@ -38,15 +41,28 @@ public class ConsumerProxy implements InvocationHandler{
         ConsumeRequest consumeRequest = new ConsumeRequest();
         consumeRequest.setServiceName(serviceName);
         consumeRequest.setMethodName(method.getName());
+        Class<?> returnType = method.getReturnType();
+
         consumeRequest.setParameters(args);
         consumeRequest.setParameterTypes(method.getParameterTypes());
         ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
 //        log.info("执行消费请求"+consumeRequest.toString());
-        Object result = service.sendRequest(consumeRequest);
-//        如果成功响应（非熔断/拦截状态）
-        if(result != null){
-            return result;
-        }
+            try {
+                CompletableFuture completableFuture = (CompletableFuture) service.sendRequest(consumeRequest,true);
+                return completableFuture;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+//        }else {
+//            Object result = service.sendRequest(consumeRequest,false);
+////        如果成功响应（非熔断/拦截状态）
+//            if(result != null){
+//                return result;
+//            }
+//        }
+
+
 //      非正常响应，检查是否有降级类，执行降级方法
         if(fallBack != void.class){
             try {

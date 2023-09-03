@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -24,7 +26,10 @@ public class ConsumerServiceImpl implements ConsumerService{
     Bootstrap bootstrap;
 
     @Resource
-    RpcProperties.RpcRegistry server;
+    RpcProperties.RpcRegistry registry;
+
+    @Resource
+    RpcProperties.RPCConsumer consumer;
 
     @Resource
     ServiceListHolder serviceListHolder;
@@ -44,14 +49,17 @@ public class ConsumerServiceImpl implements ConsumerService{
 
     /**
      * 执行逻辑
-     * 1: 根据本地服务缓存列表查询远程服务地址（负载均衡策略）
-     * 2：补全consumeRequest属性 beanName
-     * 3: 建立连接，封装RpcRequestHolder，发送请求
+     * 1: 根据请求的服务类型进行熔断判断
+     * 2：根据负载均衡获取服务提供者元数据
+     * 3: 根据元数据完善请求数据
+     * 4：建立连接，封装RpcRequestHolder，发送请求
+     * 5：如果在规定时间内返回则正常处理，添加一次正常请求次数
+     * 6：如果超时则记录一次超时请求次数
      * @param consumeRequest
      * @return
      */
     @Override
-    public Object sendRequest(ConsumeRequest consumeRequest) {
+    public Object sendRequest(ConsumeRequest consumeRequest, boolean async) {
         String serviceName = consumeRequest.getServiceName();
         /**
          * 检查服务状态，是否进行熔断
@@ -61,7 +69,9 @@ public class ConsumerServiceImpl implements ConsumerService{
             log.info("请求熔断");
             return null;
         }
-        String requestId = consumeRequest.getRequestId();
+        /**
+         * 检测服务列表是否有该服务
+         */
         List<ServiceMeta> services = serviceListHolder.getServiceByName(consumeRequest.getServiceName());
         if(services.size() == 0){
             log.error("没有可用服务!");
@@ -69,11 +79,14 @@ public class ConsumerServiceImpl implements ConsumerService{
         }
 //        负载均衡选择
         ServiceMeta service = loadBalancer.selectService(services);
-        String providerHost = service.getServiceHost();
-        int providerPort = service.getServicePort();
         String beanName = service.getBeanName();
+//        填充beanName，这一步需要获取到服务提供者的数据才能填充
         consumeRequest.setBeanName(beanName);
         CommonHeader header = new CommonHeader(RequestType.CONSUME_SERVICE);
+        String requestId = header.getRequestId();
+//        进行连接
+        String providerHost = service.getServiceHost();
+        int providerPort = service.getServicePort();
         ChannelFuture channelFuture = connectTargetService(providerHost, providerPort);
         if(channelFuture != null){
             Channel channel = channelFuture.channel();
@@ -83,20 +96,42 @@ public class ConsumerServiceImpl implements ConsumerService{
                 connectCache.removeChannelFuture(providerHost+":"+providerHost);
                 return null;
             }
+//            promise用于接下来同步接受数据，数据的接受在ConsumerHandler中，在handler中将数据放回promise中，这样就可以拿到数据了
             Promise<ProviderResponse> promise = new DefaultPromise<>(new DefaultEventLoop());
+//            通过唯一的requestId 来确保handler存值的promise和这里的promise为同一个对象
             responseCache.putPromise(requestId,promise);
             RpcRequestHolder requestHolder = new RpcRequestHolder(header,consumeRequest);
             try {
-                channel.writeAndFlush(requestHolder).sync();
-                ProviderResponse result = promise.get(2, TimeUnit.SECONDS);
+                if(async){
+                    return CompletableFuture.supplyAsync(()->{
+                        channel.writeAndFlush(requestHolder);
+                        try {
+                            ProviderResponse result = promise.get(consumer.getConsumeWaitInMs(), TimeUnit.MILLISECONDS);
+                            Object res = result.getResult();
+                            return res;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    });
+
+                }
+//                消费发送
+                channel.writeAndFlush(requestHolder);
+//                同步获取返回值并设定超时时长
+                ProviderResponse result = promise.get(consumer.getConsumeWaitInMs(), TimeUnit.MILLISECONDS);
+//                移除当前数据返回值的缓存
                 responseCache.removeResponse(requestId);
+//                增加请求通过的次数
                 fuseProtector.increaseRequest(serviceName);
                 return result.getResult();
             }catch (Exception e){
+//                如果当前异常为超时异常，则在熔断器中添加一次异常次数
                 if(e instanceof TimeoutException){
                     log.info("连接超时");
                     fuseProtector.increaseExcepts(serviceName);
                 }else {
+                    log.error("消费发送失败！");
                     e.printStackTrace();
                 }
             }
@@ -112,7 +147,7 @@ public class ConsumerServiceImpl implements ConsumerService{
     public ServiceListHolder getServiceList() {
         CommonHeader header = new CommonHeader(RequestType.GET_SERVICE);
         RpcRequestHolder requestHolder = new RpcRequestHolder(header,null);
-        ChannelFuture channelFuture = connectTargetService(server.getHost(), server.getPort());
+        ChannelFuture channelFuture = connectTargetService(registry.getHost(), registry.getPort());
         if(channelFuture != null){
             Channel channel = channelFuture.channel();
             channel.writeAndFlush(requestHolder);
@@ -136,11 +171,12 @@ public class ConsumerServiceImpl implements ConsumerService{
             }catch (Exception e){
                 log.error("连接失败，请检查服务端是否开启目标Host:"+host+"port:"+port);
                 e.printStackTrace();
+                return null;
             }
         }
         if (channelFuture!=null && channelFuture.isSuccess()) {
             connectCache.putChannelFuture(address,channelFuture);
-            log.info("连接成功,目标Host:"+host+"port:"+port);
+//            log.info("连接成功,目标Host:"+host+"port:"+port);
             return channelFuture;
         }else {
             return null;

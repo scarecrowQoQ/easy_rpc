@@ -45,7 +45,6 @@ public class ConsumerFinder implements BeanPostProcessor {
         }
 //        需要注意的是，整个过程并没有对bean进行任何修改，只是对其指定的属性进行了替换，就比如我这里替换成了一个代理对象，
 //        那么在实际中调用被 @RpcConsumer 标注的属性的方法时，会执行proxy代理对象的invoke方法，
-//        即使这个属性是个接口并且没有实现类，也能完成业务方法（即该属性已经被替换成了代理对象）
         return bean;
     }
 }

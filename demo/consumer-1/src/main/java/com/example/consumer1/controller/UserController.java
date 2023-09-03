@@ -16,4 +16,9 @@ public class UserController {
     public String getMyOrder(){
         return userService.getMyOrder();
     }
+
+    @GetMapping("/myOrderAsync")
+    public String getMyOrderByAsync(){
+        return userService.getMyOrderByAsync();
+    }
 }

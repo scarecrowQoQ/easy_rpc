@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceListHolder implements Serializable {
 
 //  当前缓存的服务列表， key=serviceName，value为当前机器下的所有服务元数据(没有线程安全问题)
-    private final ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
+    private  ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
 
     /**
      * 获取指定服务进行服务调用
@@ -25,6 +25,8 @@ public class ServiceListHolder implements Serializable {
     public List<ServiceMeta> getServiceByName(String serviceName){
         return serviceList.getOrDefault(serviceName, new ArrayList<>());
     }
+
+
 
     public boolean isExist(ServiceMeta var1){
         String serviceName = var1.getServiceName();
