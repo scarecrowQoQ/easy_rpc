@@ -3,6 +3,12 @@ rpc:
     port: 8344
     host: 127.0.0.1
     service-save-time: 5000
+    isCluster: true
+    cluster:
+      - 127.0.0.1:8344
+      - 127.0.0.1:8345
+      - 127.0.0.1:8346
+
   provider:
     port: 8082
     host: 127.0.0.1

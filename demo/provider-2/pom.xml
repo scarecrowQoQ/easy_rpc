@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.scarecrowQoQ</groupId>
     <artifactId>provider-2</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-release</version>
     <name>provider-2</name>
     <description>Demo project for Spring Boot</description>
     <properties>
@@ -18,13 +18,13 @@
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>projectApi</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1-release</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>easy_rpc_provider</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1-release</version>
         </dependency>
 
         <dependency>
@@ -53,22 +53,35 @@
     <profiles>
         <profile>
             <!--注意,此id必须与setting.xml中指定的一致,不要自作聪明改它名字-->
-            <id>ossrh</id>
+            <id>release</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
                 <!--发布到中央SNAPSHOT仓库插件-->
                 <plugins>
+                    <!--                    <plugin>-->
+                    <!--                        <groupId>org.sonatype.plugins</groupId>-->
+                    <!--                        <artifactId>nexus-staging-maven-plugin</artifactId>-->
+                    <!--                        <version>1.6.7</version>-->
+                    <!--                        <extensions>true</extensions>-->
+                    <!--                        <configuration>-->
+                    <!--                            <serverId>ossrh</serverId>-->
+                    <!--                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
+                    <!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                    <!--                        </configuration>-->
+                    <!--                    </plugin>-->
+
+                    <!--分割线-->
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
-                        <extensions>true</extensions>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.5.3</version>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
                         </configuration>
                     </plugin>
 
@@ -97,11 +110,11 @@
             <distributionManagement>
                 <snapshotRepository>
                     <!--注意,此id必须与setting.xml中指定的一致-->
-                    <id>ossrh</id>
+                    <id>release</id>
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
                 <repository>
-                    <id>ossrh</id>
+                    <id>release</id>
                     <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
@@ -125,7 +138,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.example.provider2.Provider2Application</mainClass>
+                    <mainClass>com.rpc.provider2.Provider2Application</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

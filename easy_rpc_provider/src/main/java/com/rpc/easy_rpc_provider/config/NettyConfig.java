@@ -1,8 +1,8 @@
 package com.rpc.easy_rpc_provider.config;
 
-import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.protocol.coder.NettyDecoder;
-import com.rpc.domain.protocol.coder.NettyEncoder;
+import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
+import com.rpc.easy_rpc_protocol.coder.NettyDecoder;
+import com.rpc.easy_rpc_protocol.coder.NettyEncoder;
 import com.rpc.easy_rpc_provider.nettyServer.handler.ProviderHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 public class NettyConfig {
 
     @Resource
-    RpcProperties.RpcProvider provider;
+    RpcConfigProperties.RpcProvider provider;
 
     @Resource
     ProviderHandler providerHandler;

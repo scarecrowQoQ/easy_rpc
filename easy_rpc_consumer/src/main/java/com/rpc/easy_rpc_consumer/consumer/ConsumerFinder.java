@@ -1,6 +1,6 @@
 package com.rpc.easy_rpc_consumer.consumer;
 
-import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
+import com.rpc.domain.annotation.RpcConsumer;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

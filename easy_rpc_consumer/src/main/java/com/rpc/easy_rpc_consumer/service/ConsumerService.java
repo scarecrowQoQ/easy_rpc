@@ -1,7 +1,7 @@
 package com.rpc.easy_rpc_consumer.service;
 
-import com.rpc.domain.protocol.bean.ConsumeRequest;
-import com.rpc.domain.protocol.bean.ServiceListHolder;
+import com.rpc.domain.bean.ConsumeRequest;
+import com.rpc.domain.bean.RpcServiceList;
 
 public interface ConsumerService {
     /**
@@ -14,5 +14,5 @@ public interface ConsumerService {
      * 消费者获取服务列表
      * @return
      */
-    public ServiceListHolder getServiceList();
+    public RpcServiceList getServiceList();
 }

@@ -1,26 +1,26 @@
 package com.rpc.easy_rpc_consumer.consumer;
 
-import com.rpc.easy_rpc_consumer.annotation.RpcConsumer;
-import com.rpc.easy_rpc_consumer.service.ConsumerService;
-import com.rpc.domain.protocol.bean.ConsumeRequest;
-import com.rpc.domain.utils.SpringContextUtil;
-import io.netty.util.concurrent.Promise;
+import com.rpc.easy_rpc_consumer.netServer.handler.ConsumerHandler;
+import com.rpc.easy_rpc_govern.context.RpcContext;
+import com.rpc.easy_rpc_govern.context.RpcPipeline;
+import com.rpc.easy_rpc_govern.limit.entity.LimitingRule;
+import com.rpc.easy_rpc_govern.limit.limitAnnotation.LimitingStrategy;
+import com.rpc.domain.annotation.RpcConsumer;
+import com.rpc.easy_rpc_govern.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
-
+import com.rpc.domain.bean.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class ConsumerProxy implements InvocationHandler{
 
-    private final String serviceName;
-
-    private Class<?> fallBack;
+    RpcConsumer rpcConsumer = null;
 
     public ConsumerProxy(RpcConsumer rpcConsumer){
-        this.serviceName = rpcConsumer.serviceName();
-        this.fallBack = rpcConsumer.fallback();
+
+        this.rpcConsumer = rpcConsumer;
+
     }
 
     /**
@@ -37,46 +37,30 @@ public class ConsumerProxy implements InvocationHandler{
      * @throws Throwable
      */
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        ConsumeRequest consumeRequest = new ConsumeRequest();
-        consumeRequest.setServiceName(serviceName);
-        consumeRequest.setMethodName(method.getName());
-        Class<?> returnType = method.getReturnType();
-
-        consumeRequest.setParameters(args);
-        consumeRequest.setParameterTypes(method.getParameterTypes());
-        ConsumerService service = SpringContextUtil.getBean(ConsumerService.class);
-//        log.info("执行消费请求"+consumeRequest.toString());
-            try {
-                CompletableFuture completableFuture = (CompletableFuture) service.sendRequest(consumeRequest,true);
-                return completableFuture;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-//        }else {
-//            Object result = service.sendRequest(consumeRequest,false);
-////        如果成功响应（非熔断/拦截状态）
-//            if(result != null){
-//                return result;
-//            }
-//        }
-
-
-//      非正常响应，检查是否有降级类，执行降级方法
-        if(fallBack != void.class){
-            try {
-                Object bean = SpringContextUtil.getBean(fallBack);
-                Method method1 = fallBack.getMethod(method.getName(), method.getParameterTypes());
-                Object res = method1.invoke(bean, args);
-                return res;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }else{
-            log.error("连接超时！！没有熔断类!");
-
+    public Object invoke(Object proxy, Method method, Object[] args) {
+        RpcPipeline rpcPipeline = SpringContextUtil.getBean(RpcPipeline.class);
+        ConsumerHandler consumerHandler = SpringContextUtil.getBean(ConsumerHandler.class);
+        RpcServiceList rpcServiceList = SpringContextUtil.getBean(RpcServiceList.class);
+//        消费请求初始化
+        ConsumeRequest consumeRequest = new ConsumeRequest(rpcConsumer.serviceName(),method.getName(),method.getParameterTypes(),args);
+//      限流数据获取
+        LimitingStrategy limitingStrategy = method.getAnnotation(LimitingStrategy.class);
+        LimitingRule rule = null;
+        if(limitingStrategy != null){
+             rule = new LimitingRule(limitingStrategy,args);
         }
-        return null;
+//        注入属性
+        RpcContext context = RpcContext.getContext();
+        context.setServiceName(rpcConsumer.serviceName());
+        context.setCandidateServiceList(rpcServiceList.getServiceByName(rpcConsumer.serviceName()));
+        context.setConsumeRequest(consumeRequest);
+        context.setMaxRetryTime(rpcConsumer.maxRetryTime());
+        context.setTimeout(rpcConsumer.timeout());
+        context.setGroup(rpcConsumer.group());
+//      执行rpcPipeline构造RpcContext
+        rpcPipeline.preSend(rpcConsumer,rule);
+//      执行send方法
+        return consumerHandler.sendRequest();
+
     }
 }

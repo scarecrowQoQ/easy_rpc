@@ -1,6 +1,6 @@
 package com.rpc.easy_rpc_consumer.cach;
 
-import com.rpc.domain.protocol.bean.ProviderResponse;
+import com.rpc.domain.bean.ProviderResponse;
 import io.netty.util.concurrent.Promise;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

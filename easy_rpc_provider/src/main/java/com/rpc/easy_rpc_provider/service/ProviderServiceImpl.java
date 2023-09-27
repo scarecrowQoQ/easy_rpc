@@ -1,19 +1,23 @@
 package com.rpc.easy_rpc_provider.service;
 
-import com.rpc.domain.cach.ConnectCache;
-import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.protocol.bean.*;
-import com.rpc.domain.utils.SpringContextUtil;
-import com.rpc.domain.protocol.enum2.RequestType;
+import com.rpc.domain.bean.*;
+import com.rpc.easy_rpc_protocol.cach.ConnectCache;
+import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
+import com.rpc.easy_rpc_govern.utils.SpringContextUtil;
+
+import com.rpc.domain.enumeration.RequestType;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.reflect.FastClass;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -23,11 +27,15 @@ public class ProviderServiceImpl implements ProviderService {
     @Resource
     Bootstrap bootstrap;
 
-    @Resource
-    RpcProperties.RpcRegistry server;
+    @Autowired
+    RpcConfigProperties.RpcRegistry rpcServer;
 
     @Resource
     ConnectCache connectCache;
+
+    @Resource
+    @Qualifier("serviceBean")
+    HashMap<String,Object> serviceBean;
 
     private final List<ServiceMeta> serviceMetas = new ArrayList<>();
 
@@ -35,8 +43,8 @@ public class ProviderServiceImpl implements ProviderService {
     @Override
     public Boolean registerService() {
 //        首先尝试连接注册中心
-        String host = server.getHost();
-        int port = server.getPort();
+        String host = rpcServer.getHost();
+        int port = rpcServer.getPort();
         ChannelFuture channelFuture = connectTargetService(host, port);
         if (channelFuture != null){
             try {
@@ -44,7 +52,7 @@ public class ProviderServiceImpl implements ProviderService {
                 for (ServiceMeta serviceMeta : serviceMetas) {
                     serviceMeta.setUpdateTime(System.currentTimeMillis());
                 }
-                CommonHeader commonHeader = new CommonHeader(RequestType.SEND_SERVICE);
+                RequestHeader commonHeader = new RequestHeader(RequestType.SEND_SERVICE);
                 RpcRequestHolder requestHolder = new RpcRequestHolder(commonHeader,serviceMetas);
                 log.info("注册服务");
                 channelFuture.channel().writeAndFlush(requestHolder);
@@ -63,17 +71,17 @@ public class ProviderServiceImpl implements ProviderService {
     @Scheduled(cron="0/5 * *  * * ? ")
     @Override
     public void sendHeart() {
-        CommonHeader header = new CommonHeader(RequestType.SEND_HEARTBEAT);
+        RequestHeader header = new RequestHeader(RequestType.SEND_HEARTBEAT);
         HeartBeat heartBeat = new HeartBeat();
         RpcRequestHolder requestHolder = new RpcRequestHolder(header,heartBeat);
-        ChannelFuture channelFuture = connectTargetService(server.getHost(), server.getPort());
+        ChannelFuture channelFuture = connectTargetService(rpcServer.getHost(), rpcServer.getPort());
         if(channelFuture!=null){
             try {
                 channelFuture.channel().writeAndFlush(requestHolder).sync();
             }catch (Exception e){
                 log.error("心跳发送失败");
 //                清除连接缓存
-                connectCache.removeChannelFuture(server.getHost()+":"+server.getPort());
+                connectCache.removeChannelFuture(rpcServer.getHost()+":"+rpcServer.getPort());
                 e.printStackTrace();
             }
         }else {
@@ -91,28 +99,28 @@ public class ProviderServiceImpl implements ProviderService {
      * 4： 执行代理方法返回结果，封装结果发送数据
      */
     @Override
-    public  ProviderResponse responseConsume(ConsumeRequest consumeRequest) {
+    public ProviderResponse responseConsume(ConsumeRequest consumeRequest) {
         // 提取消费请求中的参数，包括标识id，服务方beanName，方法名，参数类型，参数值
         ProviderResponse providerResponse = new ProviderResponse();
-        String beanName = consumeRequest.getBeanName();
+
         String methodName = consumeRequest.getMethodName();
         Class<?>[] parameterTypes = consumeRequest.getParameterTypes();
-        Object[] parameters = consumeRequest.getParameters();
-        Object serviceBean = SpringContextUtil.getBeanByName(beanName);
+        Object[] parameters = consumeRequest.getArgs();
+        Object bean = serviceBean.get(consumeRequest.getServiceName());
         // 创建代理对象并执行目标方法，进行异常处理
-        Class<?> serviceClass = serviceBean.getClass();
+        Class<?> serviceClass = bean.getClass();
         FastClass fastClass = FastClass.create(serviceClass);
         int methodIndex = fastClass.getIndex(methodName, parameterTypes);
         try {
-            Object targetMethodRes = fastClass.invoke(methodIndex, serviceBean, parameters);
+            Object targetMethodRes = fastClass.invoke(methodIndex, bean, parameters);
             providerResponse.setCode(200);
             providerResponse.setIsSuccess(true);
             providerResponse.setResult(targetMethodRes);
             log.info("执行成功!");
         }catch (InvocationTargetException e ){
             e.printStackTrace();
-            log.error("目标方法执行出错，检查方法:"+methodName+"执行beanName:"+beanName);
-            providerResponse.setError("服务方运行出错！---执行beanName:"+beanName+"执行方法名:"+methodName);
+            log.error("目标方法执行出错，检查方法:"+methodName+"执行beanName:"+bean);
+            providerResponse.setError("服务方运行出错！---执行beanName:"+bean+"执行方法名:"+methodName);
             providerResponse.setCode(500);
             providerResponse.setIsSuccess(false);
         }

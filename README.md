@@ -12,9 +12,9 @@
 
 ``` 
 <dependency>
-            <groupId>com.example</groupId>
+            <groupId>com.rpc</groupId>
             <artifactId>easy_rpc_core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1-release</version>
 </dependency>
 ```
 
@@ -52,9 +52,9 @@ rpc:
 
 - ```
   <dependency>
-      <groupId>com.example</groupId>
+      <groupId>com.rpc</groupId>
       <artifactId>easy_rpc_provider</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1-release</version>
   </dependency>
   ```
 
@@ -92,9 +92,9 @@ rpc:
 
 * ```
   <dependency>
-      <groupId>com.example</groupId>
+      <groupId>com.rpc</groupId>
       <artifactId>easy_rpc_consumer</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1-release</version>
   </dependency>
   
   ```

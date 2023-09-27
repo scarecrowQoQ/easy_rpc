@@ -1,8 +1,8 @@
 package com.rpc.easy_rpc_provider.nettyServer;
 
-import com.rpc.domain.config.RpcProperties;
-import com.rpc.domain.protocol.coder.NettyDecoder;
-import com.rpc.domain.protocol.coder.NettyEncoder;
+import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
+import com.rpc.easy_rpc_protocol.coder.NettyDecoder;
+import com.rpc.easy_rpc_protocol.coder.NettyEncoder;
 import com.rpc.easy_rpc_provider.nettyServer.handler.ProviderHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -23,7 +23,7 @@ import java.net.InetSocketAddress;
 public class NettyServerStarter extends Thread {
 
     @Resource
-    RpcProperties.RpcProvider provider;
+    RpcConfigProperties.RpcProvider provider;
 
     @Resource
     ProviderHandler providerHandler;

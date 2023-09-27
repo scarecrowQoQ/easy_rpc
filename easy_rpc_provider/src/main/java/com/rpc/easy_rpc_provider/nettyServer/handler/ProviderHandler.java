@@ -1,15 +1,15 @@
 package com.rpc.easy_rpc_provider.nettyServer.handler;
 
-import com.rpc.domain.protocol.bean.ProviderResponse;
+import com.rpc.domain.bean.ProviderResponse;
 import com.rpc.easy_rpc_provider.service.ProviderService;
-import com.rpc.domain.protocol.enum2.RequestType;
-import com.rpc.domain.protocol.bean.CommonHeader;
-import com.rpc.domain.protocol.bean.ConsumeRequest;
-import com.rpc.domain.protocol.bean.RpcRequestHolder;
+
+import com.rpc.domain.bean.RequestHeader;
+import com.rpc.domain.bean.ConsumeRequest;
+import com.rpc.domain.bean.RpcRequestHolder;
+import com.rpc.domain.enumeration.RequestType;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -25,19 +25,24 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
     ProviderService registerService;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg){
         RpcRequestHolder requestHolder = (RpcRequestHolder) msg;
-        CommonHeader commonHeader = requestHolder.getCommonHeader();
+        RequestHeader commonHeader = requestHolder.getRequestHeader();
         RequestType type = commonHeader.getType();
         String requestId = commonHeader.getRequestId();
         if (type.equals(RequestType.CONSUME_SERVICE)) {
             ConsumeRequest consumeRequest = (ConsumeRequest) requestHolder.getData();
             ProviderResponse providerResponse = registerService.responseConsume(consumeRequest);
-            CommonHeader header = new CommonHeader(RequestType.RESPONSE_SERVICE,requestId);
+            RequestHeader header = new RequestHeader(RequestType.RESPONSE_SERVICE,requestId);
             RpcRequestHolder response = new RpcRequestHolder(header,providerResponse);
             ctx.writeAndFlush(response);
         }else if (type.equals(RequestType.GET_SERVICE)){
             registerService.registerService();
         }
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("连接成功");
     }
 }
