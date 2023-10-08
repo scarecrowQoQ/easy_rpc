@@ -1,22 +1,34 @@
 package com.rpc.domain.bean;
 
-import com.sun.xml.internal.ws.developer.Serialization;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-
 /**
  * 统一请求完整内容，包含头消息和数据
  */
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Serialization
+@Data
 public class RpcRequestHolder implements Serializable {
 
     private RequestHeader requestHeader;
 
     private Object data;
+
+    public RequestHeader getRequestHeader() {
+        return requestHeader;
+    }
+
+    public void setRequestHeader(RequestHeader requestHeader) {
+        this.requestHeader = requestHeader;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
 }

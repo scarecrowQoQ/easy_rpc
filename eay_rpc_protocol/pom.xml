@@ -24,17 +24,20 @@
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>easy_rpc_domain</artifactId>
             <version>0.0.1-release</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.84.Final</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>easy_rpc_govern</artifactId>
             <version>0.0.1-release</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.84.Final</version>
         </dependency>
 
         <dependency>

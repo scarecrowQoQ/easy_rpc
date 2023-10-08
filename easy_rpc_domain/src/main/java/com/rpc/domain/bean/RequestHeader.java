@@ -1,9 +1,8 @@
 package com.rpc.domain.bean;
 
-import com.sun.xml.internal.ws.developer.Serialization;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.UUID;
 import com.rpc.domain.enumeration.RequestType;
@@ -12,7 +11,6 @@ import com.rpc.domain.enumeration.RequestType;
  */
 @Data
 @NoArgsConstructor
-@Serialization
 public class RequestHeader implements Serializable {
 
     private RequestType type;

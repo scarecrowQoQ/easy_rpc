@@ -12,7 +12,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Object getOrderAsync() {
+    public String getOrderAsync() {
         return null;
     }
 }

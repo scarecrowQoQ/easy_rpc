@@ -3,18 +3,13 @@ package com.rpc.easy_rpc_protocol.coder;
 import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
 import com.rpc.easy_rpc_protocol.serialization.RpcSerialization;
 import com.rpc.easy_rpc_protocol.serialization.SerializationFactory;
-
 import com.rpc.domain.bean.RpcRequestHolder;
 import com.rpc.easy_rpc_govern.utils.SpringContextUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-
 @Slf4j
 @Component
 public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder>{
@@ -38,7 +33,14 @@ public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder>{
             SerializationFactory serializationFactory = SpringContextUtil.getBean("serializationFactory",SerializationFactory.class);
             RpcConfigProperties rpcConfigProperties = SpringContextUtil.getBean(RpcConfigProperties.class);
             RpcSerialization rpcSerialization =  serializationFactory.getRpcSerialization(rpcConfigProperties.getSerialization());
-            byte[] data = rpcSerialization.serialize(requestHolder);
+            byte[] data = null;
+            try{
+                data = rpcSerialization.serialize(requestHolder);
+                log.info("data.size="+data.length);
+           }catch (Exception e){
+               e.printStackTrace();
+               log.error("序列化失败");
+           }
             byteBuf.writeInt(data.length);
             byteBuf.writeBytes(data);
         }catch (Exception e){

@@ -1,5 +1,6 @@
 package com.rpc.easy_rpc_registry.nettyServer.handler;
 
+import com.rpc.domain.bean.HeartBeat;
 import com.rpc.domain.bean.RequestHeader;
 import com.rpc.domain.bean.RpcRequestHolder;
 import com.rpc.easy_rpc_registry.registry.RegistryService;
@@ -22,6 +23,7 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = ctx.channel();
         RpcRequestHolder rpcRequestHolder = (RpcRequestHolder) msg;
+        log.info(rpcRequestHolder.toString());
         RequestHeader commonHeader = rpcRequestHolder.getRequestHeader();
         RequestType type = commonHeader.getType();
         Object data = rpcRequestHolder.getData();
@@ -35,7 +37,8 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter {
         }
 //        是否为发送心跳
         else if(type.equals(RequestType.SEND_HEARTBEAT)) {
-            registryService.handleHeartBeat(channel,data);
+            HeartBeat heartBeat = (HeartBeat) data;
+            registryService.handleHeartBeat(channel,heartBeat);
         }
     }
 

@@ -83,8 +83,7 @@ public class RegistryServiceImpl implements RegistryService {
     }
 
     @Override
-    public void handleHeartBeat(Channel channel, Object data) {
-        HeartBeat heartBeat = (HeartBeat) data;
+    public void handleHeartBeat(Channel channel,HeartBeat heartBeat ) {
         Long updateTime = heartBeat.getUpdateTime();
         ConcurrentHashMap<Channel, List<ServiceMeta>> ConnectCache = this.providerConnectCache.getProviderConnectCache();
         List<ServiceMeta> serviceMetas = ConnectCache.get(channel);

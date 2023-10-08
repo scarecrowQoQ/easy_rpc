@@ -1,5 +1,6 @@
 package com.rpc.easy_rpc_registry.registry;
 
+import com.rpc.domain.bean.HeartBeat;
 import com.rpc.domain.bean.ServiceMeta;
 import io.netty.channel.Channel;
 
@@ -31,7 +32,7 @@ public interface RegistryService {
      * 处理服务提供者发送的心跳
      *  需要注意的是发送心跳时可能没有注册服务，因此需要检查是否注册了服务，如果没有，则发送请求服务列表消息
      */
-    public  void handleHeartBeat(Channel channel, Object data);
+    public  void handleHeartBeat(Channel channel, HeartBeat heartBeat );
 
     /**
      * 剔除服务
