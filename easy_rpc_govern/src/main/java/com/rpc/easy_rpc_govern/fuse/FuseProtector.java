@@ -1,14 +1,12 @@
 package com.rpc.easy_rpc_govern.fuse;
 
-import com.rpc.domain.bean.ConsumeRequest;
-import com.rpc.domain.bean.RpcServiceList;
+
 import com.rpc.domain.bean.ServiceMeta;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +21,7 @@ public class FuseProtector implements FuseHandler{
 
     /**
      * 检查当前熔断状态，许可发送请求返回true，拦截返回false
-     * @param request
+     * @param
      * @return
      */
     public boolean fuseHandle(String serviceName){

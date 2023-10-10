@@ -1,38 +1,29 @@
 package com.rpc.easy_rpc_registry.cluster.handler;
 
-public interface ClusterHandler {
-    /**
-     * 心跳监测，用于leader向follower发送心跳来监测leader可用
-     */
-    public void sendHeartBeat();
+import com.rpc.domain.bean.RequestHeader;
+import com.rpc.domain.bean.RpcRequestHolder;
+import com.rpc.domain.enumeration.RequestType;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.springframework.stereotype.Service;
 
-    /**
-     * 向其他节点请求拉票
-     */
-    public void askVote();
+/**
+ * 作为服务端接受消息后响应
+ * 主要包含：
+ * 1.对拉票请求进行响应
+ * 2.对确认Leader请求进行响应
+ * 3.
+ */
+@Service
+@ChannelHandler.Sharable
+public class ClusterHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        RpcRequestHolder rpcRequestHolder = (RpcRequestHolder) msg;
+        RequestType type = rpcRequestHolder.getRequestHeader().getType();
 
-    /**
-     * 向其他其他节点投票
-     */
-    public void vote();
 
-    /**
-     * 向其他节点确认自己leader身份
-     */
-    public void confirmLeaderShip();
-
-    /**
-     * 向从节点进行数据同步
-     */
-    public void synchronousDataToFollower();
-
-    /**
-     * 更新从leader发布的数据
-     */
-    public void synchronousDataFromLeader();
-
-    /**
-     * 返回一个确认消息
-     */
-    public void sendACK();
+        super.channelRead(ctx, msg);
+    }
 }

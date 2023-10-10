@@ -9,7 +9,6 @@ import java.util.HashMap;
 public class ProviderConfig {
     /**
      * 此配置用于保存服务吗与bean之间的映射关系，方便执行
-     * @return
      */
     @Bean(name = "serviceBean")
     public HashMap<String,Object> serviceBean(){

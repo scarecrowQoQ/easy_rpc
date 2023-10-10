@@ -5,10 +5,9 @@
     <parent>
         <artifactId>easy_rpc</artifactId>
         <groupId>io.github.scarecrowQoQ</groupId>
-        <version>0.0.1-release</version>
+        <version>0.0.2-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>easy_rpc_domain</artifactId>
     <dependencies>
         <dependency>

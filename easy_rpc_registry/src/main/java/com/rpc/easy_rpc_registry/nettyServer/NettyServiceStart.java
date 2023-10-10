@@ -1,6 +1,7 @@
 package com.rpc.easy_rpc_registry.nettyServer;
 
 import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
+import com.rpc.easy_rpc_registry.cluster.handler.ClusterHandler;
 import com.rpc.easy_rpc_registry.nettyServer.handler.RegistryHandler;
 import com.rpc.easy_rpc_protocol.coder.NettyDecoder;
 import com.rpc.easy_rpc_protocol.coder.NettyEncoder;
@@ -33,9 +34,12 @@ public class NettyServiceStart implements Runnable, InitializingBean {
     @Resource
     @Qualifier("taskExecutor")
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
+//  对消费与提供者的网络处理器
     @Resource
-    RegistryHandler nettyHandlerInit;
+    RegistryHandler registryHandler;
+//  集群内部的网络处理器
+    @Resource
+    ClusterHandler clusterHandler;
 
     @SneakyThrows
     @Override
@@ -53,7 +57,8 @@ public class NettyServiceStart implements Runnable, InitializingBean {
                             socketChannel.pipeline()
                                     .addLast("decode",new NettyDecoder())
                                     .addLast("encode",new NettyEncoder())
-                                    .addLast(nettyHandlerInit);
+                                    .addLast(registryHandler)
+                                    .addLast(clusterHandler);
                         }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind().sync();

@@ -7,12 +7,14 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-/**
- * 此注解用于标注需要进行代理成远程调用对象的属性
- * 除了serviceName以外的参数都是特殊于此服务的属性，如果没有设置，则以配置类的Consumer中同一为标准
- * 如果用户希望对于特殊的服务进行特殊的规定，那么可以对该服务进行自定义规范
- */
+
 public @interface RpcConsumer {
+
+    /**
+     * 此注解用于标注需要进行代理成远程调用对象的属性
+     * 除了serviceName以外的参数都是特殊于此服务的属性，如果没有设置，则以配置类的Consumer中同一为标准
+     * 如果用户希望对于特殊的服务进行特殊的规定，那么可以对该服务进行自定义规范
+     */
     String serviceName();
 
     String group() default "";

@@ -23,9 +23,8 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = ctx.channel();
         RpcRequestHolder rpcRequestHolder = (RpcRequestHolder) msg;
-        log.info(rpcRequestHolder.toString());
-        RequestHeader commonHeader = rpcRequestHolder.getRequestHeader();
-        RequestType type = commonHeader.getType();
+        RequestHeader requestHeader = rpcRequestHolder.getRequestHeader();
+        RequestType type = requestHeader.getType();
         Object data = rpcRequestHolder.getData();
 //        添加服务请求
         if (type.equals(RequestType.SEND_SERVICE)) {
@@ -39,6 +38,11 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter {
         else if(type.equals(RequestType.SEND_HEARTBEAT)) {
             HeartBeat heartBeat = (HeartBeat) data;
             registryService.handleHeartBeat(channel,heartBeat);
+        }
+
+//       如果都没有匹配则调用下一个处理器
+        else {
+            ctx.fireChannelRead(msg);
         }
     }
 

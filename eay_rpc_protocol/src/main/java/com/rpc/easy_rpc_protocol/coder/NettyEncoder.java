@@ -36,7 +36,6 @@ public class NettyEncoder extends MessageToByteEncoder<RpcRequestHolder>{
             byte[] data = null;
             try{
                 data = rpcSerialization.serialize(requestHolder);
-                log.info("data.size="+data.length);
            }catch (Exception e){
                e.printStackTrace();
                log.error("序列化失败");

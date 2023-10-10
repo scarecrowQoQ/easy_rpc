@@ -40,7 +40,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     @Resource
     Bootstrap bootstrap;
 
-
     @Resource
     RpcConfigProperties.RPCConsumer consumer;
 
@@ -77,7 +76,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     public Object sendRequest(){
         RpcContext rpcContext = RpcContext.getContext();
-
         String requestId = rpcContext.getRequestHeader().getRequestId();
         ServiceMeta remoteService = rpcContext.getRemoteService();
         ChannelFuture channelFuture = connectTargetService(remoteService.getServiceHost(), remoteService.getServicePort());

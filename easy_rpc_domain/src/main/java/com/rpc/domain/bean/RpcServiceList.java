@@ -1,9 +1,6 @@
 package com.rpc.domain.bean;
 
-import com.rpc.domain.bean.ServiceMeta;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +14,6 @@ public class RpcServiceList implements Serializable {
 
     /**
      * 获取指定服务进行服务调用
-     * @param serviceName
-     * @return
      */
     public List<ServiceMeta> getServiceByName(String serviceName){
         return serviceList.getOrDefault(serviceName, new ArrayList<>());

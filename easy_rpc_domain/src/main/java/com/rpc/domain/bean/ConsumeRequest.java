@@ -1,6 +1,5 @@
 package com.rpc.domain.bean;
 
-import com.rpc.domain.annotation.RpcConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -4,11 +4,11 @@
     <parent>
         <artifactId>easy_rpc</artifactId>
         <groupId>io.github.scarecrowQoQ</groupId>
-        <version>0.0.1-release</version>
+        <version>0.0.2-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>easy_rpc_registry</artifactId>
-    <version>0.0.1-release</version>
+    <version>0.0.2-release</version>
     <name>easy_rpc_registry</name>
     <description>Demo project for Spring Boot</description>
     <properties>
@@ -26,19 +26,19 @@
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>easy_rpc_domain</artifactId>
-            <version>0.0.1-release</version>
+            <version>0.0.2-release</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>eay_rpc_protocol</artifactId>
-            <version>0.0.1-release</version>
+            <version>0.0.2-release</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.scarecrowQoQ</groupId>
             <artifactId>easy_rpc_govern</artifactId>
-            <version>0.0.1-release</version>
+            <version>0.0.2-release</version>
         </dependency>
 
         <dependency>
