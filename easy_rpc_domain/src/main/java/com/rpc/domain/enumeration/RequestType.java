@@ -15,7 +15,7 @@ public enum RequestType {
 //    以下为集群相关
 
 //  leader心跳
-    LeaderHeartBeat,
+    LEADER_HEARTBEAT,
 
 //  响应ack
     RESPONSE_ACK,

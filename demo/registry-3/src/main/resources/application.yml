@@ -1,7 +1,7 @@
 rpc:
   registry:
     host: 127.0.0.1
-    port: 8344
+    port: 8346
     cluster: true
     clusterAddress:
       - 127.0.0.1:8344

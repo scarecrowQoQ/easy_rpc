@@ -10,9 +10,15 @@ import java.util.Date;
 @Data
 public class HeartBeat implements Serializable {
 
+    private String initiator;
+
     Long updateTime;
 
     public HeartBeat(){
         this.updateTime = new Date().getTime();
+    }
+
+    public HeartBeat(String initiator){
+        this.initiator = initiator;
     }
 }

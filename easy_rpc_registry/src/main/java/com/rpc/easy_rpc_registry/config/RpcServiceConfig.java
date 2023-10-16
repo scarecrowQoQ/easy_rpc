@@ -16,8 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class RpcServiceConfig   {
     @Bean
     public RpcServiceList rpcServiceList(){
-        RpcServiceList rpcServiceList = new RpcServiceList();
-        return rpcServiceList;
+        return new RpcServiceList();
     }
 
 

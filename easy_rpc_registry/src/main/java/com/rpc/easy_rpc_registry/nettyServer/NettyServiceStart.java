@@ -1,8 +1,10 @@
 package com.rpc.easy_rpc_registry.nettyServer;
 
 import com.rpc.easy_rpc_govern.config.RpcConfigProperties;
+import com.rpc.easy_rpc_registry.cluster.bean.NodeContent;
 import com.rpc.easy_rpc_registry.cluster.handler.ClusterHandler;
-import com.rpc.easy_rpc_registry.nettyServer.handler.RegistryHandler;
+import com.rpc.easy_rpc_registry.cluster.service.ClusterService;
+import com.rpc.easy_rpc_registry.nettyServer.handler.RegistryInBoundHandler;
 import com.rpc.easy_rpc_protocol.coder.NettyDecoder;
 import com.rpc.easy_rpc_protocol.coder.NettyEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -34,12 +37,18 @@ public class NettyServiceStart implements Runnable, InitializingBean {
     @Resource
     @Qualifier("taskExecutor")
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
 //  对消费与提供者的网络处理器
     @Resource
-    RegistryHandler registryHandler;
+    RegistryInBoundHandler registryHandler;
+
 //  集群内部的网络处理器
     @Resource
     ClusterHandler clusterHandler;
+
+    @Resource
+    @Lazy
+    ClusterService clusterService;
 
     @SneakyThrows
     @Override
@@ -63,8 +72,10 @@ public class NettyServiceStart implements Runnable, InitializingBean {
                     });
             ChannelFuture channelFuture = serverBootstrap.bind().sync();
             log.info("开启netty服务:"+ channelFuture.channel().localAddress());
+            if (rpcServer.getCluster()) {
+                clusterService.initCluster();
+            }
             channelFuture.channel().closeFuture().sync();
-            log.info("112");
         }catch (Exception e){
             e.printStackTrace();
         }finally {

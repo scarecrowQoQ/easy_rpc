@@ -54,6 +54,7 @@ public class RpcContext {
     public static RpcContext getContext(){
         RpcContext rpcContext = threadLocal.get();
         if(rpcContext == null){
+            threadLocal.remove();
             rpcContext  = new RpcContext();
             rpcContext.setAttrs(new HashMap<>());
             rpcContext.setRequestHeader(new RequestHeader(RequestType.CONSUME_SERVICE));

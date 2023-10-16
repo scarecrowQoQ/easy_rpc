@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class RpcServiceList implements Serializable {
 
-//  当前缓存的服务列表， key=serviceName，value为当前机器下的所有服务元数据(没有线程安全问题)
-    private  ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
+//  当前缓存的服务列表， key=serviceName，value为当前机器下的所有服务元数据
+    private ConcurrentHashMap<String, List<ServiceMeta>> serviceList = new ConcurrentHashMap<>();
 
     /**
      * 获取指定服务进行服务调用

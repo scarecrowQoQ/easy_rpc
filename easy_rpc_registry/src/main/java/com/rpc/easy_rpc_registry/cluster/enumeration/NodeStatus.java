@@ -8,5 +8,5 @@ public enum NodeStatus {
 //  候选者
     CANDIDATE,
 //  初始(系统初始化或者失去Leader时的状态)
-    inception;
+    INITIAL;
 }

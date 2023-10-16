@@ -74,11 +74,11 @@ public class RpcPipeline {
      */
     public void preSend(RpcConsumer consumerAnnotation,LimitingRule rule) {
         RpcContext rpcContext = RpcContext.getContext();
-        Boolean isPass = null;
+        Boolean pass = null;
 //        限流层处理
         if(rule!=null){
-            isPass = this.limitHandler.limitHandle(rule);
-            if(!isPass){
+            pass = this.limitHandler.limitHandle(rule);
+            if(!pass){
 //              降级处理
                 rpcContext.setSupplier(()-> fallBackHandler(rule.getFallBack(), rpcContext.getConsumeRequest()));
                 rpcContext.setSend(false);
@@ -87,8 +87,8 @@ public class RpcPipeline {
         }
 //      熔断层处理
         if(rpcConsumer.fuseEnable){
-            isPass = fuseHandler.fuseHandle(consumerAnnotation.serviceName());
-            if (!isPass) {
+            pass = fuseHandler.fuseHandle(consumerAnnotation.serviceName());
+            if (!pass) {
                 rpcContext.setSupplier(()-> fallBackHandler(consumerAnnotation.fallback(),rpcContext.getConsumeRequest()));
                 rpcContext.setSend(false);
                 return;
@@ -111,8 +111,8 @@ public class RpcPipeline {
 //      请求过滤器处理
         requestFilterHandler.filterHandler();
 //      请求拦截层处理
-        isPass = requestInterceptHandler.interceptorHandle(rpcContext);
-        if (!isPass){
+        pass = requestInterceptHandler.interceptorHandle(rpcContext);
+        if (!pass){
             rpcContext.setSend(false);
             return;
         }

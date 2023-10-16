@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 @Component
 @Slf4j
 @ChannelHandler.Sharable
-public class RegistryHandler extends ChannelInboundHandlerAdapter {
+public class RegistryInBoundHandler extends ChannelInboundHandlerAdapter {
 
     @Resource
     RegistryService registryService;

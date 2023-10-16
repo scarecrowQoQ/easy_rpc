@@ -13,7 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ResponseCache {
 
-    public ConcurrentHashMap<String, Promise<ProviderResponse>> responseCache = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, Promise<ProviderResponse>> responseCache;
+
+    public ResponseCache(){
+        responseCache = new ConcurrentHashMap<>();
+    }
 
     public void putPromise(String requestId,Promise<ProviderResponse> promise){
         responseCache.put(requestId,promise);

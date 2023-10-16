@@ -96,12 +96,22 @@ public class RpcConfigProperties {
         /**
          * 是否开始集群模式
          */
-        public Boolean isCluster = false;
+        public Boolean cluster = false;
 
         /**
          * 集群的ip配置
          */
-        public List<String> cluster;
+        public List<String> clusterAddress;
+
+        /**
+         *  leader发送心跳时间间隔
+         */
+        public Long sendLeaderHeartBeatTime = 5000L;
+
+        /**
+         * 检测Leader心跳的执行间隔
+         */
+        public Long checkLeaderHeartBeatTime = 7000L;
     }
 
 
