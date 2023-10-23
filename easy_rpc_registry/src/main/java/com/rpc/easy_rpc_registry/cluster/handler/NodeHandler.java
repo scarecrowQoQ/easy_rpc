@@ -60,6 +60,7 @@ public class NodeHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void handleVoteResponse(VoteResponse voteResponse){
+        nodeContent.getNodeStatusListener().incrBallot(voteResponse.getVoteId());
 //      如果结果为不投票或者当前身份不是候选者或者响应的选期id与当前选期id不一致则为无效投票
         if(!voteResponse.getVote()){
             log.error("无效投票，对方不选择投票");
@@ -74,6 +75,5 @@ public class NodeHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         nodeContent.getBallot().incrementAndGet();
-        nodeContent.getNodeStatusListener().incrBallot(voteResponse.getVoteId());
     }
 }

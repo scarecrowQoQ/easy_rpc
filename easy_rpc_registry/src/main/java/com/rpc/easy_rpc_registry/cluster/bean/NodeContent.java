@@ -50,8 +50,5 @@ public class NodeContent {
         }else if(nodeStatus.equals(NodeStatus.CANDIDATE)){
             nodeStatusListener.onBecomingCandidate();
         }
-
     }
-
-
 }

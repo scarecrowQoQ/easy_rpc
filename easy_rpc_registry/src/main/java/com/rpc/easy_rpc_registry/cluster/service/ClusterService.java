@@ -16,8 +16,6 @@ public interface ClusterService {
      */
     public RpcRequestHolder vote(VoteRequest voteRequest);
 
-
-
     /**
      * 向其他节点确认自己leader身份
      */

@@ -29,6 +29,5 @@ public class VoteResponse implements Serializable {
         this.vote = vote;
         this.createTime = new Date();
         this.voteId = voteId;
-
     }
 }

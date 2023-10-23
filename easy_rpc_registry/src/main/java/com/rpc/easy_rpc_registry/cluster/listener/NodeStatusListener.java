@@ -58,8 +58,7 @@ public class NodeStatusListener {
         while (!nodeContent.getNodeStatus().equals(NodeStatus.FOLLOWER)||!nodeContent.getNodeStatus().equals(NodeStatus.LEADER)){
             log.info("开始本轮选举，当前选期id="+nodeContent.getTermId());
             if(nodeContent.getNodeStatus().equals(NodeStatus.LEADER)||nodeContent.getNodeStatus().equals(NodeStatus.FOLLOWER)){
-                log.info("选举结束");
-                return;
+                break;
             }
             Random random = new Random();
 //          随机睡眠时间，不超过最大规定时间
@@ -73,7 +72,7 @@ public class NodeStatusListener {
 //          如果已经给其他节点投过票了，则不参与选举
             if(nodeContent.getVoted()){
                 log.info("已经给其他节点投过票了,退出本轮选举");
-                return;
+                break;
             }
 //          如果睡眠结束后仍然没有进行投票则转为候选者并发起投票
             nodeContent.setNodeStatus(NodeStatus.CANDIDATE);

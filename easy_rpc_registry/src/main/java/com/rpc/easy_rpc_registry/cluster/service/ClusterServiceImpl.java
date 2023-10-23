@@ -80,7 +80,7 @@ public class ClusterServiceImpl implements ClusterService {
         syncWaitResponse(voteRequest.getVoteId(),1000l,nodeContent.getClusterNodeAmount()-1);
         log.info("本轮投票结束，当前票数"+nodeContent.getBallot());
         //       当前的选票数量大于集群节点数量/2，则身份变为Leader
-        if(nodeContent.getBallot().get()>=nodeContent.getClusterNodeAmount()/2+1){
+        if(nodeContent.getBallot().get()>=(nodeContent.getClusterNodeAmount()/2+1)){
             nodeContent.setNodeStatus(NodeStatus.LEADER);
         }
     }
@@ -96,7 +96,7 @@ public class ClusterServiceImpl implements ClusterService {
         int termId = voteRequest.getTermId();
         RequestHeader header = new RequestHeader(RequestType.VOTE);
 //       对于选期不大于当前选期的投票请求拒绝,对于当前身份已经是Leader拒绝，对于已为其他节点投票进行拒绝
-        if(nodeContent.getTermId()>=termId||nodeContent.getNodeStatus().equals(NodeStatus.LEADER)||nodeContent.getVoted()){
+        if(nodeContent.getTermId()>termId||nodeContent.getNodeStatus().equals(NodeStatus.LEADER)||nodeContent.getVoted()){
             VoteResponse voteResponse = new VoteResponse(nodeContent.getAddress(),termId,voteRequest.getVoteId(), Boolean.FALSE);
             return new RpcRequestHolder(header,voteResponse);
         }else {
